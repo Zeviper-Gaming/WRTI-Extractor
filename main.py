@@ -13,7 +13,7 @@ for table in tables:
     # Vérifie si la table contient les valeurs recherchées (par exemple, en vérifiant l'en-tête)
     header_row = table.find("tr")
     header_columns = header_row.find_all("th")
-    if len(header_columns) > 1 and header_columns[1].text.strip() == "Max Speed\n(km/h at 4,500 m)":
+    if len(header_columns) > 1 and "Max Speed" in header_columns[1].text.strip():
         target_table = table
         break
 
