@@ -17,11 +17,11 @@ for table in tables:
         target_table = table
         break
 
-if table is None:
+if target_table is None:
     print("Table des limites non trouvée.")
 else:
     # Recherche de la ligne correspondant aux limites des ailes
-    rows = table.find_all("tr")
+    rows = target_table.find_all("tr")
     for row in rows:
         columns = row.find_all("th")
         if len(columns) > 0 and "Wings" in columns[0].text.strip():
