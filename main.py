@@ -21,15 +21,14 @@ for table in tables:
 if target_table is None: # Erreur si table non trouvable
     print("Table des limites non trouvée.")
 else:
-    # Recherche de la ligne correspondant aux limites des ailes
+    # Recherche de la dernière ligne du tableau "Limits"
     rows = target_table.find_all("tr")
-    for row in rows:
-        columns = row.find_all("th")
-        if len(columns) > 0 and "Wings" in columns[0].text.strip():
-            wing_limits = [col.text.strip() for col in columns[1:]]  # Récupération des limites des ailes
-            break
+    last_row = rows[-1]
 
-    if 'wing_limits' in locals():  # Test si variable wing_limits présente dans les variables
-        print("Limites des ailes (km/h) :", wing_limits)
+    # Extraction des valeurs de la dernière ligne
+    values = [col.text.strip() for col in last_row.find_all("td")]
+
+    if len(values) == 0:
+        print("Aucune valeur trouvée dans la dernière ligne.")
     else:
-        print("Limites des ailes non trouvées.")
+        print("Valeurs de la dernière ligne :", values)
