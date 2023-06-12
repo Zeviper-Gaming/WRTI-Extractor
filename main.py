@@ -3,6 +3,13 @@ from functions.cfg_files    import rewrite_cfg_file
 
 # Variables
 url_path = "https://wiki.warthunder.com/V.G.33C-1"
+
+# Generation du nom de fichier
+filename = url_path.split("/")[-1]
+filename = filename.lower()
+filename = filename.replace(".","")
+filename = filename.replace("-","_")
+
 # extraction des données et pré-traitement
 html_content = extract_url(url_path)
 
