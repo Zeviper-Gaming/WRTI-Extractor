@@ -15,8 +15,10 @@ limits = find_limits(tables)
 
 print(limits)
 
-wings_limit = limits[0]
-gear_limit = limits[1]
-flaps_1_limit = limits[2]
-flaps_2_limit = limits[3]
-flaps_3_limit = limits[4]
+wings_limit     =   limits[0]
+gear_limit      =   limits[1]
+flaps_1_limit   =   limits[2]
+flaps_2_limit   =   limits[3]
+flaps_3_limit   =   limits[4]
+
+
