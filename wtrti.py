@@ -1,8 +1,11 @@
-# Lire le fichier de configuration
-folder      = "config_files"
-filename    = "vg_33.cfg"
-path        = f"{folder}/{filename}"
+def rewrite_cfg_file(nom_fichier,values):
+    assert type(values) is dict
 
+    with open("config_files/custom.cfg", 'r') as f:
+        contenu = f.read()
 
-with open(path, 'r') as file:
-    config_data = file.read()
+    for variable, valeur in values.keys(): #fixme to many values to unpack
+        contenu = contenu.replace(variable, valeur)
+
+    with open(nom_fichier, 'w') as f:
+        f.write(contenu)
