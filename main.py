@@ -32,4 +32,4 @@ dico_alerts = {
     "Vlow"      : str(150),
 }
 #rewrite_cfg_file(f"{file_path}/{filename}",dico_alerts)
-rewrite_cfg_file(f"{file_path}/test.cfg",dico_alerts)
+rewrite_cfg_file(f"{file_path}/custom.cfg",dico_alerts)
