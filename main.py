@@ -1,5 +1,5 @@
-from function   import *
-from wtrti      import rewrite_cfg_file
+from functions.html         import *
+from functions.cfg_files    import rewrite_cfg_file
 
 # Variables
 url_path = "https://wiki.warthunder.com/V.G.33C-1"

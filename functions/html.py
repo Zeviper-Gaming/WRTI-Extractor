@@ -23,7 +23,6 @@ def find_limits(tables):
         if "Limits" in header_columns[0].text.strip():
             target_table = table
             break
-
     if target_table is not None:
         # Recherche de la dernière ligne du tableau "Limits"
         rows = target_table.find_all("tr")
