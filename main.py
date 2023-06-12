@@ -3,8 +3,6 @@ from functions.cfg_files    import rewrite_cfg_file
 
 # Variables
 url_path = "https://wiki.warthunder.com/V.G.33C-1"
-dico_alerts = dict()
-
 # extraction des données et pré-traitement
 html_content = extract_url(url_path)
 
@@ -16,11 +14,12 @@ tables  = find_all_tables(html_content)
 limits = find_limits(tables)
 
 wings_limit     = float(limits[0])
-dico_alerts["Vmax"]    = str(wings_limit)
-dico_alerts["Vred"]    = str(wings_limit - 50)
-dico_alerts["Vorange"] = str(wings_limit - 150)
-dico_alerts["V2"]      = str(300)
-dico_alerts["V1"]      = str(200)
-dico_alerts["Vlow"]    = str(150)
-
+dico_alerts = {
+    "Vmax"      : str(wings_limit),
+    "Vred"      : str(wings_limit - 50),
+    "Vorange"   : str(wings_limit - 150),
+    "V2"        : str(300),
+    "V1"        : str(200),
+    "Vlow"      : str(150),
+}
 rewrite_cfg_file("config_files/test.cfg",dico_alerts)
