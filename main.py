@@ -2,13 +2,15 @@ from functions.html         import *
 from functions.cfg_files    import rewrite_cfg_file
 
 # Variables
-url_path = "https://wiki.warthunder.com/V.G.33C-1"
+url_path    = "https://wiki.warthunder.com/V.G.33C-1"
+file_path   = "config_files"
 
 # Generation du nom de fichier
-filename = url_path.split("/")[-1]
-filename = filename.lower()
-filename = filename.replace(".","")
-filename = filename.replace("-","_")
+filename  = url_path.split("/")[-1]
+filename  = filename.lower()
+filename  = filename.replace(".","")
+filename  = filename.replace("-","_")
+filename += ".cfg"
 
 # extraction des données et pré-traitement
 html_content = extract_url(url_path)
@@ -20,7 +22,7 @@ tables  = find_all_tables(html_content)
 # Recherche des valeurs importantes
 limits = find_limits(tables)
 
-wings_limit     = float(limits[0])
+wings_limit     = int(limits[0])
 dico_alerts = {
     "Vmax"      : str(wings_limit),
     "Vred"      : str(wings_limit - 50),
@@ -29,4 +31,5 @@ dico_alerts = {
     "V1"        : str(200),
     "Vlow"      : str(150),
 }
-rewrite_cfg_file("config_files/test.cfg",dico_alerts)
+#rewrite_cfg_file(f"{file_path}/{filename}",dico_alerts)
+rewrite_cfg_file(f"{file_path}/test.cfg",dico_alerts)

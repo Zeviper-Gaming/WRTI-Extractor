@@ -1,11 +1,15 @@
+import os
+
 def rewrite_cfg_file(nom_fichier,values):
     assert type(values) is dict
 
-    with open("config_files/custom.cfg", 'r') as f:
-        contenu = f.read()
+    fichier_temp = nom_fichier + '.tmp'  # Nom du fichier temporaire
 
-    for variable, valeur in values.keys(): #fixme to many values to unpack
-        contenu = contenu.replace(variable, valeur)
+    with open(nom_fichier, 'r') as f_in, open(fichier_temp, 'w') as f_out:
+        for ligne in f_in:
+            for variable, valeur in values.keys():
+                ligne = ligne.replace(variable, valeur)
+            f_out.write(ligne)
 
-    with open(nom_fichier, 'w') as f:
-        f.write(contenu)
+    # Remplacement terminé, renommer le fichier temporaire
+    os.replace(fichier_temp, nom_fichier)
