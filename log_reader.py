@@ -10,13 +10,14 @@ os.chdir(log_folder_path)
 
 # list of files
 files = os.listdir()
-target_file = files[0]
+target_file = files[1]
 
 data = Csv2Dict(target_file)
 
 plt.figure("TAS, km/h")
 plt.plot(data["Time, s"],data["TAS, km/h"])
-plt.figure('Climb, m/s')
-plt.plot(data["Time, s"],data['Climb, m/s'])
+plt.figure('Specific energy, J/kg[KJ/kg]')
+plt.plot(data["Time, s"],data['Specific energy, J/kg[KJ/kg]'],'b-')
+plt.plot(data["Time, s"],data['Propeller pitch, %'],"b--")
 plt.figure('Altitude, ft')
 plt.plot(data["Time, s"],data['Altitude, ft'])
