@@ -5,6 +5,7 @@ def name_cfg_from_url(url):
     filename = filename.lower()
     filename = filename.replace(".", "")
     filename = filename.replace("-", "_")
+    filename = filename.replace("%", "")
     filename += ".cfg"
     return filename
 
