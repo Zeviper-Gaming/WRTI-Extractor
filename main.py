@@ -1,9 +1,5 @@
 import os
-
-from functions.html         import extract_url,find_limits,find_all_tables,BeautifulSoup
-from functions.cfg_files    import rewrite_cfg_file
-from functions.others       import name_cfg_from_url,copy_cfg_file_as
-from datas.list_websites    import list_wiki_url
+from list_url import list_wiki_url
 
 # Variables
 for url in list_wiki_url:
