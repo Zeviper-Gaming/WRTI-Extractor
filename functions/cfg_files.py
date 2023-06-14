@@ -1,5 +1,7 @@
 import os
 
+
+########################################################################################################################
 def rewrite_cfg_file(nom_fichier, values):
     assert isinstance(values, dict)
 
@@ -13,3 +15,28 @@ def rewrite_cfg_file(nom_fichier, values):
 
     # Remplacement terminé, renommer le fichier temporaire
     os.replace(fichier_temp, nom_fichier)
+
+########################################################################################################################
+def cfg2dict(fichier):
+    """
+    Convertit un fichier de configuration wtrti en un dictionnaire avec une liste de tuples
+    :param fichier:
+    :return: Dictionnaire contentant toutes les variables
+    """
+    config_dict = {}
+    with open(fichier, 'r') as f:
+        lines = f.readlines()
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith('[') and line.endswith(']'):
+            section = line[1:-1]
+            config_dict[section] = []
+        elif '=' in line:
+            variable, valeur = line.split('=')
+            variable = variable.strip()
+            valeur = valeur.strip()
+            if section:
+                config_dict[section].append((variable, valeur))
+
+    return config_dict
