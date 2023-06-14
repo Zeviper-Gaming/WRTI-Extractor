@@ -1,14 +1,15 @@
 import os
+import functions as func
 from list_url import list_wiki_url
 
 # Variables
 for url in list_wiki_url:
     os.chdir("config_files")
-    filename = name_cfg_from_url(url)
-    copy_cfg_file_as(filename)
+    filename = func.name_cfg_from_url(url)
+    func.copy_cfg_file_as(filename)
     break
     # extraction des données et pré-traitement
-    html_content = extract_url(url)
+    html_content = func.extract_url(url)
 
     # Recherches des tables
     soup    = BeautifulSoup(html_content, 'html.parser')

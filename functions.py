@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import shutil
 import os
 
+########################################################################################################################
 def extract_url(url):
     response = requests.get(url)
     if response.status_code == 200:
@@ -12,10 +13,12 @@ def extract_url(url):
         print("Une erreur s'est produite lors de la récupération du contenu HTML.")
     return html_content
 
+########################################################################################################################
 def find_all_tables(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
     return soup.find_all("table", class_="wikitable")
 
+########################################################################################################################
 def find_limits(tables):
     target_table = None
     for table in tables:
@@ -34,6 +37,7 @@ def find_limits(tables):
     else: print("Table des limites non trouvée.") # Erreur si table non trouvable
     return values
 
+########################################################################################################################
 def name_cfg_from_url(url):
     filename = url.split("/")[-1]
     filename = filename.lower()
@@ -43,9 +47,11 @@ def name_cfg_from_url(url):
     filename += ".cfg"
     return filename
 
+########################################################################################################################
 def copy_cfg_file_as(target_name,destination=""):
     shutil.copyfile("custom.cfg",f"{destination}/{target_name}")
 
+########################################################################################################################
 def rewrite_cfg_file(filename, values):
     assert isinstance(values, dict)
     with open(filename, 'r') as f_in:
