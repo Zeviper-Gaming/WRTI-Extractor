@@ -36,14 +36,14 @@ def import_data_from_dict(data_dico):
       V1       = str(250)
       V2       = str(350)
       Vlow     = str(150)
-      Vd       = str(0.6*int(Va) + 0.4*int(Vc)) # why not ?
+      Vd       = str(0.6*float(Va) + 0.4*float(Vc)) # why not ?
       Vg_red   = str(int(Vg)*0.8)
 
       dico_variable = {
-         "Vmax"   : Vmax,
-         "Fc"     : Fc,
-         "Fd"     : Fd,
-         "Vc"     : Vc,
+         "Vmax"   : str(Vmax),
+         "Fc"     : str(Fc),
+         "Fd"     : str(Fd),
+         "Vc"     : str(Vc),
          "Va"     : Va,
          "Vg"     : Vg,
          "Vred"   : Vred,
@@ -54,7 +54,8 @@ def import_data_from_dict(data_dico):
          "Vd"     : Vd,
          "Vg_reg" : Vg_red,
       }
-      rewrite_cfg_file(name,dico_variable)
+      os.chdir("F:\Github Local\WRTI-Extractor\data")
+      rewrite_cfg_file(f"{name}.cfg",dico_variable)
 
 def rewrite_cfg_file(filename,variables):
    with open(filename,"r") as current_file:
