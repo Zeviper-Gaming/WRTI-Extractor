@@ -15,5 +15,3 @@ if IS_UPDATE:
 os.chdir("config_files/") # go to WTRTI profile folder
 dico_fm_data_db = csv.Csv2Dict("fm_data_db.csv") #fixme can not load file as dict (see format of csv file (, and ;) )
 print("Data load into dico")
-
-func.generate_cfg_files(dico_fm_data_db)
