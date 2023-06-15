@@ -43,9 +43,9 @@ def import_data_from_dict(data_dico):
          "Vmax"   : str(Vmax),
          "Fc"     : str(Fc),
          "Fd"     : str(Fd),
-         "Vc"     : str(Vc),
+         "Vc"     : Vc,
          "Va"     : Va,
-         "Vg"     : Vg,
+         "Vg"     : str(Vg),
          "Vred"   : Vred,
          "Vorange": Vorange,
          "V1"     : V1,
@@ -59,6 +59,8 @@ def import_data_from_dict(data_dico):
 
 def rewrite_cfg_file(filename,variables):
    with open(filename,"r") as current_file:
+      all_file_lines = current_file.readlines()
+   with open(filename,"w") as current_file:
       for ligne in current_file:
          for variable,valeur in variables.items():
             ligne = ligne.replace(variable,valeur)
