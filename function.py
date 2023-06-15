@@ -18,5 +18,50 @@ def generate_cfg_files(data_dico):
    for name in data_dico["Name"]:
       shutil.copy(f"{path_source}\custom.cfg",f"{path_target}\{name}.cfg")
 
+def import_data_from_dict(data_dico):
+   for i,name in enumerate(data_dico["Name"]):
+      # Vmax
+      Vmax  = data_dico["CritAirSpd"][i]
+      # Flaps angles
+      Fc    = data_dico["CombatFlaps"][i]
+      Fd    = data_dico["TakeoffFlaps"][i]
+      # Flaps ctritical speed
+      Vc    = data_dico["CritFlapsSpd"][i].split(":")[1]
+      Va    = data_dico["CritFlapsSpd"][i].split(":")[3]
+      # Gear critical spead
+      Vg    = data_dico["CritGearSpd"][i]
+
+      Vred     = str(int(Vmax) - 50)
+      Vorange  = str(int(Vmax) - 150)
+      V1       = str(250)
+      V2       = str(350)
+      Vlow     = str(150)
+      Vd       = str(0.6*int(Va) + 0.4*int(Vc)) # why not ?
+      Vg_red   = str(int(Vg)*0.8)
+
+      dico_variable = {
+         "Vmax"   : Vmax,
+         "Fc"     : Fc,
+         "Fd"     : Fd,
+         "Vc"     : Vc,
+         "Va"     : Va,
+         "Vg"     : Vg,
+         "Vred"   : Vred,
+         "Vorange": Vorange,
+         "V1"     : V1,
+         "V2"     : V2,
+         "Vlow"   : Vlow,
+         "Vd"     : Vd,
+         "Vg_reg" : Vg_red,
+      }
+      rewrite_cfg_file(name,dico_variable)
+
+def rewrite_cfg_file(filename,variables):
+   with open(filename,"r") as current_file:
+      for ligne in current_file:
+         for variable,valeur in variables.items():
+            ligne = ligne.replace(variable,valeur)
+         current_file.write(ligne)
+
 ##################### TEST ZONE
 update_wtrti_data()
