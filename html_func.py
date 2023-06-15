@@ -14,6 +14,9 @@ def import_from_url(name):
    html_content = extract_from_url(url)
    # Isole le code des tableau de la page
    all_table = find_all_tables(html_content)
+   # Cherche le tableau "Optimal velocities" et extraits les données
+   target_table = find_table(all_table, "Optimal velocities")
+   values = extract_last_line_from_table(target_table)
    return dico_html_variables
 
 def get_url_from_name(name):
