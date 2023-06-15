@@ -21,13 +21,19 @@ def generate_cfg_files(data_dico):
 def import_data_from_dict(data_dico):
    for i,name in enumerate(data_dico["Name"]):
       # Vmax
-      Vmax  = data_dico["CritAirSpd"][i]
+      if ":" not in data_dico["CritAirSpd"][i]:
+         Vmax  = data_dico["CritAirSpd"][i]
+      else:
+         Vmax  = data_dico["CritAirSpd"][i].split(":")[-1]
       # Flaps angles
       Fc    = data_dico["CombatFlaps"][i]
       Fd    = data_dico["TakeoffFlaps"][i]
       # Flaps ctritical speed
-      Vc    = data_dico["CritFlapsSpd"][i].split(":")[1]
-      Va    = data_dico["CritFlapsSpd"][i].split(":")[3]
+      if data_dico["CritFlapsSpd"][i] != "":
+         Vc    = data_dico["CritFlapsSpd"][i].split(":")[1]
+         Va    = data_dico["CritFlapsSpd"][i].split(":")[3]
+      else:
+         Vc,Va = "0","0"
       # Gear critical spead
       Vg    = data_dico["CritGearSpd"][i]
 
@@ -45,6 +51,7 @@ def import_data_from_dict(data_dico):
          "Fd"     : str(Fd),
          "Vc"     : Vc,
          "Va"     : Va,
+         "Vg_red" : Vg_red,
          "Vg"     : str(Vg),
          "Vred"   : Vred,
          "Vorange": Vorange,
@@ -52,7 +59,6 @@ def import_data_from_dict(data_dico):
          "V2"     : V2,
          "Vlow"   : Vlow,
          "Vd"     : Vd,
-         "Vg_reg" : Vg_red,
       }
       os.chdir("F:\Github Local\WRTI-Extractor\data")
       rewrite_cfg_file(f"{name}.cfg",dico_variable)
