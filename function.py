@@ -1,4 +1,5 @@
 import os
+import shutil
 
 def update_wtrti_data():
    os.chdir("D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\FM")
@@ -14,14 +15,10 @@ def update_wtrti_data():
    source_file.close()
 
 def generate_cfg_files(data_dico):
-   os.chdir("F:\Github Local\WRTI-Extractor\config_files")
-   source_file = open("custom.cfg")
-   os.chdir("F:\Github Local\WRTI-Extractor\data")
+   path_source = "F:\Github Local\WRTI-Extractor\config_files"
+   path_target = "F:\Github Local\WRTI-Extractor\data"
    for name in data_dico["Name"]:
-      current_file = open(f"{name}.cfg","w")
-      for line in source_file:
-         current_file.write(line)
-      current_file.close()
+      shutil.copy(f"{path_source}\custom.cfg",f"{path_target}\{name}.cfg")
 
 ##################### TEST ZONE
 update_wtrti_data()
