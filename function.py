@@ -34,9 +34,9 @@ def import_data_from_dict(data_dico):
          Vd = "0"
          Va = "0"
       elif  len(data_dico["CritFlapsSpd"][i].split(":")) == 2:
-         Vc = "0"
+         Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
          Vd = "0"
-         Va = data_dico["CritFlapsSpd"][i].split(":")[1]
+         Va = "0"
       elif  len(data_dico["CritFlapsSpd"][i].split(":")) == 4:
          Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
          Va = data_dico["CritFlapsSpd"][i].split(":")[3]
