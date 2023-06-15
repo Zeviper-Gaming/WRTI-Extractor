@@ -21,7 +21,7 @@ def generate_cfg_files(data_dico):
 def import_data_from_dict(data_dico):
    for i,name in enumerate(data_dico["Name"]):
       # Vmax
-      if ":" not in data_dico["CritAirSpd"][i]:
+      if ":" not in str(data_dico["CritAirSpd"][i]):
          Vmax  = data_dico["CritAirSpd"][i]
       else:
          Vmax  = data_dico["CritAirSpd"][i].split(":")[-1]
@@ -29,11 +29,22 @@ def import_data_from_dict(data_dico):
       Fc    = data_dico["CombatFlaps"][i]
       Fd    = data_dico["TakeoffFlaps"][i]
       # Flaps ctritical speed
-      if data_dico["CritFlapsSpd"][i] != "":
+      if    len(data_dico["CritFlapsSpd"][i].split(":")) == 1:
+         Vc = "0"
+         Vd = "0"
+         Va = "0"
+      elif  len(data_dico["CritFlapsSpd"][i].split(":")) == 2:
+         Vc = "0"
+         Vd = "0"
+         Va = data_dico["CritFlapsSpd"][i].split(":")[1]
+      elif  len(data_dico["CritFlapsSpd"][i].split(":")) == 4:
+         Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
+         Va = data_dico["CritFlapsSpd"][i].split(":")[3]
+         Vd = str(0.6 * float(Va) + 0.4 * float(Vc))
+      elif  len(data_dico["CritFlapsSpd"][i].split(":")) >= 6:
          Vc    = data_dico["CritFlapsSpd"][i].split(":")[1]
-         Va    = data_dico["CritFlapsSpd"][i].split(":")[3]
-      else:
-         Vc,Va = "0","0"
+         Vd    = data_dico["CritFlapsSpd"][i].split(":")[3]
+         Va    = data_dico["CritFlapsSpd"][i].split(":")[5]
       # Gear critical spead
       Vg    = data_dico["CritGearSpd"][i]
 
@@ -42,7 +53,6 @@ def import_data_from_dict(data_dico):
       V1       = str(250)
       V2       = str(350)
       Vlow     = str(150)
-      Vd       = str(0.6*float(Va) + 0.4*float(Vc)) # why not ?
       Vg_red   = str(int(Vg)*0.8)
 
       dico_variable = {
