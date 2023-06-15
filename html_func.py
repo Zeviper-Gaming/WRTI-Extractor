@@ -56,7 +56,6 @@ def find_all_tables(html_content):
    soup = bs(html_content, 'html.parser')
    return soup.find_all("table", class_="wikitable")
 
-
 def find_table(tables,title):
    """
    Trouve une table spécifique en cherchant le titre du tableau
@@ -80,3 +79,18 @@ def extract_last_line_from_table(table):
    # Extraction des valeurs de la dernière ligne
    values = [col.text.strip() for col in last_row.find_all("td")]
    return values
+
+def find_datasheet_url(html_content):
+   """
+   Trouve l'url du data sheet de l'avion concerné.
+   Attention ! Certains avion n'ont pas de data sheet, dans ce cas la fonction retourne :None:
+   :param html_content:
+   :return: url du datasheet ou None
+   """
+   datasheet_url = None
+   soup = bs(html_content, 'html.parser')
+   all_url = soup.find_all('a', class_='external text')
+   for url in all_url:
+      if "data sheet" in url.contents[0]:
+         datasheet_url = url["href"]
+   return datasheet_url
