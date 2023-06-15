@@ -61,7 +61,7 @@ def rewrite_cfg_file(filename,variables):
    with open(filename,"r") as current_file:
       all_file_lines = current_file.readlines()
    with open(filename,"w") as current_file:
-      for ligne in current_file:
+      for ligne in all_file_lines:
          for variable,valeur in variables.items():
             ligne = ligne.replace(variable,valeur)
          current_file.write(ligne)
