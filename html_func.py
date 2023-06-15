@@ -15,12 +15,21 @@ def import_from_url(name):
    html_content = extract_from_url(url)
    # Isole le code des tableau de la page
    all_table = find_all_tables(html_content)
+
+   ## OPTIMAL VELOCITIES
    # Cherche le tableau "Optimal velocities" et extraits les données
    target_table = find_table(all_table, "Optimal velocities")
    # Extraction de données brutes
    opt_velocities_data = extract_last_line_from_table(target_table)
    # Traitement des données
-   func.get_opt_velicities(opt_velocities_data)
+   V1,V2,Vrad = func.get_opt_velicities(opt_velocities_data)
+
+   ## PACKING INTO DICO
+   dico_html_variables = {
+      "V1"     : V1,
+      "V2"     : V2,
+      "Vrad"   : Vrad
+   }
    return dico_html_variables
 
 def get_url_from_name(name):

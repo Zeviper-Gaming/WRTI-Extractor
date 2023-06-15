@@ -38,11 +38,12 @@ def import_data_from_dict(data_dico):
       Vred     = str(0.90*int(Vmax))
       Vorange  = str(0.80*int(Vmax))
       Vmax     = str(0.95*int(Vmax))
-      V1       = str(250)
-      V2       = str(350)
-      Vlow     = str(150)
+      V1       = str(0.50*int(Vmax))
+      V2       = str(0.60*int(Vmax))
+      Vlow     = str(0.30*int(Vmax))
       Vg_red   = str(int(Vg)*0.8)
 
+      # Packing data
       dico_variable = {
          "Vmax"   : str(Vmax),
          "Fc"     : str(Fc),
