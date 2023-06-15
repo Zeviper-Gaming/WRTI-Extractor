@@ -27,13 +27,17 @@ def import_data_from_dict(data_dico):
          Vmax  = data_dico["CritAirSpd"][i].split(":")[-1]
       # Flaps angles and critical speed
       Fc,Fd,Vc,Vd,Va = get_flaps_crit_speed(data_dico,i)
-      # Flaps ctritical speed
+      # RPM warning #todo theses variables are not used (rpm_1,rpm_2,rpm_3)
+      rpm_1    = int(data_dico["RPM"].split(":")[0])
+      rpm_2    = int(data_dico["RPM"].split(":")[1])
+      rpm_3    = int(data_dico["RPM"].split(":")[2])
+      rpm_3    = 0.95
+      # Gear critical speed
+      Vg       = data_dico["CritGearSpd"][i]
 
-      # Gear critical spead
-      Vg    = data_dico["CritGearSpd"][i]
-
-      Vred     = str(int(Vmax) - 50)
-      Vorange  = str(int(Vmax) - 150)
+      Vred     = str(0.90*int(Vmax))
+      Vorange  = str(0.80*int(Vmax))
+      Vmax     = str(0.95*int(Vmax))
       V1       = str(250)
       V2       = str(350)
       Vlow     = str(150)
