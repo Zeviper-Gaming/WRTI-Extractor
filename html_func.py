@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup as bs
+import function as func
 
 
 def import_from_url(name):
@@ -16,7 +17,10 @@ def import_from_url(name):
    all_table = find_all_tables(html_content)
    # Cherche le tableau "Optimal velocities" et extraits les données
    target_table = find_table(all_table, "Optimal velocities")
-   values = extract_last_line_from_table(target_table)
+   # Extraction de données brutes
+   opt_velocities_data = extract_last_line_from_table(target_table)
+   # Traitement des données
+   func.get_opt_velicities(opt_velocities_data)
    return dico_html_variables
 
 def get_url_from_name(name):

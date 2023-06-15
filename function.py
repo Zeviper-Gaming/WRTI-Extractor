@@ -98,5 +98,15 @@ def get_flaps_crit_speed(data_dico,index):
       if int(Fd) == 0: Vc = Va
 
    return Fc,Fd,Vc,Vd,Va
+
+def get_opt_velicities(values):
+   v_ailerons  = int(values[0].split("< ")[-1])
+   v_rudder    = int(values[1].split("< ")[-1])
+   v_elevators = int(values[2].split("< ")[-1])
+   v_radiator  = int(values[3].split("> ")[-1])
+   V1          = min(v_ailerons,v_elevators,v_rudder)*0.8
+   V2          = max(v_ailerons,v_elevators,v_rudder)*0.9
+   Vrad        = v_radiator
+   return V1,V2,Vrad
 ##################### TEST ZONE
 #update_wtrti_data()
