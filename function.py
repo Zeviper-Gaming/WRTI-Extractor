@@ -25,26 +25,10 @@ def import_data_from_dict(data_dico):
          Vmax  = data_dico["CritAirSpd"][i]
       else:
          Vmax  = data_dico["CritAirSpd"][i].split(":")[-1]
-      # Flaps angles
-      Fc    = data_dico["CombatFlaps"][i]
-      Fd    = data_dico["TakeoffFlaps"][i]
+      # Flaps angles and critical speed
+      Fc,Fd,Vc,Vd,Va = get_flaps_crit_speed(data_dico,i)
       # Flaps ctritical speed
-      if    len(data_dico["CritFlapsSpd"][i].split(":")) == 1:
-         Vc = "0"
-         Vd = "0"
-         Va = "0"
-      elif  len(data_dico["CritFlapsSpd"][i].split(":")) == 2:
-         Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
-         Vd = "0"
-         Va = "0"
-      elif  len(data_dico["CritFlapsSpd"][i].split(":")) == 4:
-         Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
-         Va = data_dico["CritFlapsSpd"][i].split(":")[3]
-         Vd = str(0.6 * float(Va) + 0.4 * float(Vc))
-      elif  len(data_dico["CritFlapsSpd"][i].split(":")) >= 6:
-         Vc    = data_dico["CritFlapsSpd"][i].split(":")[1]
-         Vd    = data_dico["CritFlapsSpd"][i].split(":")[3]
-         Va    = data_dico["CritFlapsSpd"][i].split(":")[5]
+
       # Gear critical spead
       Vg    = data_dico["CritGearSpd"][i]
 
@@ -82,5 +66,33 @@ def rewrite_cfg_file(filename,variables):
             ligne = ligne.replace(variable,valeur)
          current_file.write(ligne)
 
+def get_flaps_crit_speed(data_dico,index):
+   i = index
+   Fc = data_dico["CombatFlaps"][i]
+   Fd = data_dico["TakeoffFlaps"][i]
+   Vc, Vd, Va = None, None, None
+
+   if len(data_dico["CritFlapsSpd"][i].split(":")) == 1:
+      Vc = "0"
+      Vd = "0"
+      Va = "0"
+   elif len(data_dico["CritFlapsSpd"][i].split(":")) == 2:
+      Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
+      Vd = "0"
+      Va = "0"
+   elif len(data_dico["CritFlapsSpd"][i].split(":")) == 4:
+      Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
+      Va = data_dico["CritFlapsSpd"][i].split(":")[3]
+      Vd = str(0.6 * float(Va) + 0.4 * float(Vc))
+      if int(Fc) == 0: Vc = Vd
+      if int(Fd) == 0: Vd = Va
+   elif len(data_dico["CritFlapsSpd"][i].split(":")) >= 6:
+      Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
+      Vd = data_dico["CritFlapsSpd"][i].split(":")[3]
+      Va = data_dico["CritFlapsSpd"][i].split(":")[5]
+      if int(Fc) == 0: Vc = Vd
+      if int(Fd) == 0: Vd = Va
+
+   return Fc,Fd,Vc,Vd,Va
 ##################### TEST ZONE
 update_wtrti_data()
