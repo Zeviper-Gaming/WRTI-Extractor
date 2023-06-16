@@ -77,8 +77,8 @@ def rewrite_cfg_file(filename,variables):
 
 def get_flaps_crit_speed(data_dico,index):
    i = index
-   Fc = data_dico["CombatFlaps"][i]
-   Fd = data_dico["TakeoffFlaps"][i]
+   Fc = int(data_dico["CombatFlaps"][i])  +1
+   Fd = int(data_dico["TakeoffFlaps"][i]) +1
    Vc, Vd, Va = None, None, None
 
    if len(data_dico["CritFlapsSpd"][i].split(":")) == 1:
