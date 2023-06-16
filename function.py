@@ -49,8 +49,8 @@ def import_data_from_dict(data_dico):
          "Vmax"   : str(Vmax),
          "Fc"     : str(Fc),
          "Fd"     : str(Fd),
-         "Vc"     : Vc,
-         "Va"     : Va,
+         "Vc"     : str(Vc),
+         "Va"     : str(Va),
          "Vg_red" : Vg_red,
          "Vg"     : str(Vg),
          "Vred"   : Vred,
@@ -58,7 +58,7 @@ def import_data_from_dict(data_dico):
          "V1"     : V1,
          "V2"     : V2,
          "Vlow"   : Vlow,
-         "Vd"     : Vd,
+         "Vd"     : str(Vd),
          "rpm_1"  : rpm_1,
          "rpm_2"  : rpm_2,
          "rpm_3"  : rpm_3,
@@ -86,19 +86,19 @@ def get_flaps_crit_speed(data_dico,index):
       Vd = "0"
       Va = "0"
    elif len(data_dico["CritFlapsSpd"][i].split(":")) == 2:
-      Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
+      Vc = 0.95*  float(data_dico["CritFlapsSpd"][i].split(":")[1])
       Vd = "0"
       Va = "0"
    elif len(data_dico["CritFlapsSpd"][i].split(":")) == 4:
-      Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
-      Va = data_dico["CritFlapsSpd"][i].split(":")[3]
+      Vc = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[1])
+      Va = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[3])
       Vd = str(0.6 * float(Va) + 0.4 * float(Vc))
       if int(Fc) == 0: Vc = Vd
       if int(Fd) == 0: Vc = Va
    elif len(data_dico["CritFlapsSpd"][i].split(":")) >= 6:
-      Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
-      Vd = data_dico["CritFlapsSpd"][i].split(":")[3]
-      Va = data_dico["CritFlapsSpd"][i].split(":")[5]
+      Vc = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[1])
+      Vd = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[3])
+      Va = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[5])
       if int(Fc) == 0: Vc = Vd
       if int(Fd) == 0: Vc = Va
 
