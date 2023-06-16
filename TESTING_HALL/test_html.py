@@ -1,8 +1,7 @@
-import requests
-from bs4 import BeautifulSoup as bs
-
 import html_func
-from html_func import *
+import requests
+from html_func  import *
+from bs4        import BeautifulSoup as bs
 
 
 url = "https://wiki.warthunder.com/V.G.33C-1" # for test
@@ -10,6 +9,7 @@ url = "https://wiki.warthunder.com/V.G.33C-1" # for test
 # Extrait le code html du site
 html_content = extract_from_url(url)
 
-datasheet_url = url = html_func.find_datasheet_url(html_content)
+url_datasheet = url = html_func.find_datasheet_url(html_content)
+datasheet_content = extract_from_url(url_datasheet)
 
 print("end")
