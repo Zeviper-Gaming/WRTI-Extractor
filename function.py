@@ -93,14 +93,14 @@ def get_flaps_crit_speed(data_dico,index):
       Vc = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[1])
       Va = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[3])
       Vd = str(0.6 * float(Va) + 0.4 * float(Vc))
-      if int(Fc) == 0: Vc = Vd
-      if int(Fd) == 0: Vc = Va
+      if int(Fc) == 0: Vc = "0"
+      if int(Fd) == 0: Vd = "0"
    elif len(data_dico["CritFlapsSpd"][i].split(":")) >= 6:
       Vc = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[1])
       Vd = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[3])
       Va = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[5])
-      if int(Fc) == 0: Vc = Vd
-      if int(Fd) == 0: Vc = Va
+      if int(Fc) == 0: Vc = "0"
+      if int(Fd) == 0: Vd = "0"
 
    return Fc,Fd,Vc,Vd,Va
 ##################### TEST ZONE
