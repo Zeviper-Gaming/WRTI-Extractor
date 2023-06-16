@@ -28,10 +28,9 @@ def import_data_from_dict(data_dico):
       # Flaps angles and critical speed
       Fc,Fd,Vc,Vd,Va = get_flaps_crit_speed(data_dico,i)
       # RPM warning #todo theses variables are not used (rpm_1,rpm_2,rpm_3)
-      rpm_1    = int(data_dico["RPM"][0].split(":")[0])
-      rpm_2    = int(data_dico["RPM"][0].split(":")[1])
-      rpm_3    = int(data_dico["RPM"][0].split(":")[2])
-      rpm_3    = 0.95
+      rpm_1    = 1.00*  float(data_dico["RPM"][i].split(":")[0])
+      rpm_2    = 1.00*  float(data_dico["RPM"][i].split(":")[1])
+      rpm_3    = 0.95*  float(data_dico["RPM"][i].split(":")[2])
       # Gear critical speed
       Vg       = data_dico["CritGearSpd"][i]
 
