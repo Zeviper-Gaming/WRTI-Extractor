@@ -28,9 +28,9 @@ def import_data_from_dict(data_dico):
       # Flaps angles and critical speed
       Fc,Fd,Vc,Vd,Va = get_flaps_crit_speed(data_dico,i)
       # RPM warning #todo theses variables are not used (rpm_1,rpm_2,rpm_3)
-      rpm_1    = int(data_dico["RPM"].split(":")[0])
-      rpm_2    = int(data_dico["RPM"].split(":")[1])
-      rpm_3    = int(data_dico["RPM"].split(":")[2])
+      rpm_1    = int(data_dico["RPM"][0].split(":")[0])
+      rpm_2    = int(data_dico["RPM"][0].split(":")[1])
+      rpm_3    = int(data_dico["RPM"][0].split(":")[2])
       rpm_3    = 0.95
       # Gear critical speed
       Vg       = data_dico["CritGearSpd"][i]
@@ -42,6 +42,9 @@ def import_data_from_dict(data_dico):
       V2       = str(350)
       Vlow     = str(150)
       Vg_red   = str(int(Vg)*0.8)
+      rpm_1    = str(rpm_1)
+      rpm_2    = str(rpm_2)
+      rpm_3    = str(rpm_3)
 
       dico_variable = {
          "Vmax"   : str(Vmax),
@@ -57,6 +60,9 @@ def import_data_from_dict(data_dico):
          "V2"     : V2,
          "Vlow"   : Vlow,
          "Vd"     : Vd,
+         "rpm_1"  : rpm_1,
+         "rpm_2"  : rpm_2,
+         "rpm_3"  : rpm_3,
       }
       os.chdir("F:\Github Local\WRTI-Extractor\data")
       rewrite_cfg_file(f"{name}.cfg",dico_variable)
