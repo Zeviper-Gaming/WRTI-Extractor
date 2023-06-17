@@ -1,9 +1,10 @@
 import requests
+from url_list import get_suffix_from_list
 from bs4 import BeautifulSoup as bs
 import function as func
 
 
-def import_from_url(name):
+def import_from_url(name):  # sourcery skip: inline-immediately-returned-variable
    """
    Recupère certaines variables depuis le wiki de WT
    :param name: nom d'objet de l'avion
@@ -40,8 +41,8 @@ def get_url_from_name(name):
    :return: url du wiki pour l'avion
    """
    #todo Trouver comment transformer :name: en suffixe url
-   url = f"https://wiki.warthunder.com/{name}"
-   return url
+   suffix = get_suffix_from_list(name)
+   return f"https://wiki.warthunder.com/{suffix}"
 
 def extract_from_url(url):
    response = requests.get(url)
@@ -76,9 +77,7 @@ def extract_last_line_from_table(table):
    # Recherche de la dernière ligne du tableau "Limits"
    rows = table.find_all("tr")
    last_row = rows[-1]
-   # Extraction des valeurs de la dernière ligne
-   values = [col.text.strip() for col in last_row.find_all("td")]
-   return values
+   return [col.text.strip() for col in last_row.find_all("td")]
 
 def find_datasheet_url(html_content):
    """
