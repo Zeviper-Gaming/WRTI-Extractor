@@ -4,7 +4,7 @@ import MyPack2.Saves.CSV as csv
 
 # Constante
 IS_UPDATE = False
-UPDATE_CFG_FILES = False
+UPDATE_CFG_FILES = True
 os.chdir("F:\Github Local\WRTI-Extractor") # Ensure that the code begin in main folder
 
 # Update data or not ?

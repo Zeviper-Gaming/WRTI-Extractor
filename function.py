@@ -28,9 +28,9 @@ def import_data_from_dict(data_dico):
       # Flaps angles and critical speed
       Fc,Fd,Vc,Vd,Va = get_flaps_crit_speed(data_dico,i)
       # RPM warning #todo theses variables are not used (rpm_1,rpm_2,rpm_3)
-      rpm1    = int(   1*  int(data_dico["RPM"].split(":")[0]))
-      rpm2    = int(   1*  int(data_dico["RPM"].split(":")[1]))
-      rpm3    = int(0.95*  int(data_dico["RPM"].split(":")[2]))
+      rpm_1    = 1.00*  float(data_dico["RPM"][i].split(":")[0])
+      rpm_2    = 1.00*  float(data_dico["RPM"][i].split(":")[1])
+      rpm_3    = 0.95*  float(data_dico["RPM"][i].split(":")[2])
       # Gear critical speed
       Vg       = data_dico["CritGearSpd"][i]
 
@@ -41,14 +41,17 @@ def import_data_from_dict(data_dico):
       V2       = str(0.60*int(Vmax))
       Vlow     = str(0.30*int(Vmax))
       Vg_red   = str(int(Vg)*0.8)
+      rpm_1    = str(rpm_1)
+      rpm_2    = str(rpm_2)
+      rpm_3    = str(rpm_3)
 
       # Packing data
       dico_variable = {
          "Vmax"   : str(Vmax),
          "Fc"     : str(Fc),
          "Fd"     : str(Fd),
-         "Vc"     : Vc,
-         "Va"     : Va,
+         "Vc"     : str(Vc),
+         "Va"     : str(Va),
          "Vg_red" : Vg_red,
          "Vg"     : str(Vg),
          "Vred"   : Vred,
@@ -56,10 +59,11 @@ def import_data_from_dict(data_dico):
          "V1"     : V1,
          "V2"     : V2,
          "Vlow"   : Vlow,
-         "Vd"     : Vd,
-         "rpm1"   : rpm1,
-         "rpm2"   : rpm2,
-         "rpm3"   : rpm3,
+
+         "Vd"     : str(Vd),
+         "rpm_1"  : rpm_1,
+         "rpm_2"  : rpm_2,
+         "rpm_3"  : rpm_3,
       }
       os.chdir("F:\Github Local\WRTI-Extractor\data")
       rewrite_cfg_file(f"{name}.cfg",dico_variable)
@@ -75,8 +79,8 @@ def rewrite_cfg_file(filename,variables):
 
 def get_flaps_crit_speed(data_dico,index):
    i = index
-   Fc = data_dico["CombatFlaps"][i]
-   Fd = data_dico["TakeoffFlaps"][i]
+   Fc = int(data_dico["CombatFlaps"][i])  +1
+   Fd = int(data_dico["TakeoffFlaps"][i]) +1
    Vc, Vd, Va = None, None, None
 
    if len(data_dico["CritFlapsSpd"][i].split(":")) == 1:
@@ -84,21 +88,21 @@ def get_flaps_crit_speed(data_dico,index):
       Vd = "0"
       Va = "0"
    elif len(data_dico["CritFlapsSpd"][i].split(":")) == 2:
-      Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
+      Vc = 0.95*  float(data_dico["CritFlapsSpd"][i].split(":")[1])
       Vd = "0"
       Va = "0"
    elif len(data_dico["CritFlapsSpd"][i].split(":")) == 4:
-      Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
-      Va = data_dico["CritFlapsSpd"][i].split(":")[3]
+      Vc = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[1])
+      Va = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[3])
       Vd = str(0.6 * float(Va) + 0.4 * float(Vc))
-      if int(Fc) == 0: Vc = Vd
-      if int(Fd) == 0: Vc = Va
+      if int(Fc) == 1: Vc = "0"
+      if int(Fd) == 1: Vd = "0"
    elif len(data_dico["CritFlapsSpd"][i].split(":")) >= 6:
-      Vc = data_dico["CritFlapsSpd"][i].split(":")[1]
-      Vd = data_dico["CritFlapsSpd"][i].split(":")[3]
-      Va = data_dico["CritFlapsSpd"][i].split(":")[5]
-      if int(Fc) == 0: Vc = Vd
-      if int(Fd) == 0: Vc = Va
+      Vc = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[1])
+      Vd = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[3])
+      Va = 0.95*   float(data_dico["CritFlapsSpd"][i].split(":")[5])
+      if int(Fc) == 1: Vc = "0"
+      if int(Fd) == 1: Vd = "0"
 
    return Fc,Fd,Vc,Vd,Va
 
