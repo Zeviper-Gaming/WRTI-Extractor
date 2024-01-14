@@ -2,10 +2,19 @@ import os
 import shutil
 
 def update_wtrti_data():
-   os.chdir("D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\FM")
+   '''
+   Fait la mise à jour des données de WTRTI pour ce programme. A n'utiliser que l'orsque les caractéritiques
+   des avions ont été modifiés.
+   Ce programme récupère le fichier de données "fm_data_db.csv", dans lequel se trouve toutes les valeurs des
+   caractéristiques de tous les avions. Il en fait en suite une copie dans les dossiers de ce programme afin
+   d'être utilisé.
+   - fm_data_db.csv : fichier contenant toutes les valeurs des avions utilisé par le programme WTRTI.
+   :return:
+   '''
+   os.chdir("D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\FM") # Se déplace dans le dossier des fichier csv de WTRTI
    with open("fm_data_db.csv","r") as source_file:
-      os.chdir("F:\Github Local\WRTI-Extractor\config_files")
-      new_data_file = open("fm_data_db.csv","w")
+      os.chdir("F:\Github Local\WRTI-Extractor\config_files") # Se déplace dans le dossier de config de ce programme
+      new_data_file = open("fm_data_db.csv","w") # fait une copie de "fm_data_db.csv" pour ce programme
 
       for line in source_file:
          line = line.replace(",",":")
@@ -13,12 +22,24 @@ def update_wtrti_data():
          new_data_file.write(line)
 
 def generate_cfg_files(data_dico):
-   path_source = "F:\Github Local\WRTI-Extractor\config_files"
-   path_target = "F:\Github Local\WRTI-Extractor\data"
+   '''
+   Fait une copie du fichier custom.cfg pour chaques avions enregistrés dans "fm_data_db.csv"
+   :custom.cfg:   Fichier cfg dans lequel on retrouve toutes les variables qui seront remplacé par ce programme par
+                  les valeurs correctes pour chaques avions.
+   :param data_dico:
+   :return:
+   '''
+   path_source = "F:\Github Local\WRTI-Extractor\config_files" #Dossier de config avec les données
+   path_target = "F:\Github Local\WRTI-Extractor\data" #Dossier regroupant les fichiers de chaques avions
    for name in data_dico["Name"]:
       shutil.copy(f"{path_source}\custom.cfg",f"{path_target}\{name}.cfg")
 
 def import_data_from_dict(data_dico):
+   '''
+   Cette fonction récupère pour chaques avions, les données compilés dans data_dico, et va réécrire tous les fichiers
+   cfg de chaques avions du dossier "data" avec les valeurs correspondantes.
+   C'est également dans cette fonction que tous les calculs sont générés afin de produire les bonnes valeurs.
+   '''
    for i,name in enumerate(data_dico["Name"]):
       # Vmax
       if ":" not in str(data_dico["CritAirSpd"][i]):
