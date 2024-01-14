@@ -1,5 +1,6 @@
 import os
 import shutil
+from MyPack2.Myos import TERMINAL
 
 def update_wtrti_data():
    '''
@@ -29,10 +30,15 @@ def generate_cfg_files(data_dico):
    :param data_dico:
    :return:
    '''
-   path_source = "F:\Github Local\WRTI-Extractor\config_files" #Dossier de config avec les données
-   path_target = "F:\Github Local\WRTI-Extractor\data" #Dossier regroupant les fichiers de chaques avions
+   if TERMINAL == "PC":
+      path_source = "F:\Github Local\WRTI-Extractor\config_files" #Dossier de config avec les données
+      path_target = "F:\Github Local\WRTI-Extractor\data" #Dossier regroupant les fichiers de chaques avions
+   elif TERMINAL == "MAC":
+      path_source = "/Users/florian/Github Local/WRTI-Extractor/config_files"
+      path_target = "/Users/florian/Github Local/WRTI-Extractor/data"
    for name in data_dico["Name"]:
-      shutil.copy(f"{path_source}\custom.cfg",f"{path_target}\{name}.cfg")
+      if TERMINAL == "PC":    shutil.copy(f"{path_source}\custom.cfg",f"{path_target}\{name}.cfg")
+      if TERMINAL == "MAC":   shutil.copy(f"{path_source}/custom.cfg",f"{path_target}/{name}.cfg")
 
 def import_data_from_dict(data_dico):
    '''
@@ -84,7 +90,8 @@ def import_data_from_dict(data_dico):
          "rpm_2"  : rpm_2,
          "rpm_3"  : rpm_3,
       }
-      os.chdir("F:\Github Local\WRTI-Extractor\data")
+      if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor\data")
+      if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/data")
       rewrite_cfg_file(f"{name}.cfg",dico_variable)
 
 def rewrite_cfg_file(filename,variables):

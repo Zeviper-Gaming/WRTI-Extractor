@@ -7,8 +7,11 @@ Il remplace l'utilsation du programme "main.py" avec les paramètres décris dan
 import os
 import function as func
 import MyPack2.Saves.CSV as csv
+from MyPack2.Myos import TERMINAL
 
-os.chdir("F:\Github Local\WRTI-Extractor") # S'assure que le programme commence dans le dossier parent de ce programme
+# S'assure que le programme commence dans le dossier parent de ce programme
+if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor")
+if TERMINAL == "MAC": os.chdir("/Users/florian/Github Local/WRTI-Extractor")
 
 # Charge les données de config de ce programme dans un dico
 os.chdir("config_files/")
