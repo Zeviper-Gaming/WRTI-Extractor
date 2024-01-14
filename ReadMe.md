@@ -3,6 +3,12 @@
 - Comporte l'ensemble des foonctions appelés par le programme
 ### `main.py`
 - Fichier pilote principal.
+### generate_cfg_files
+Ce programme permet de regénérer les fichiers cfg pour chaques avions a partir des données du fichier "fm_data_db.csv"
+contenue dans le dossier "config_files" de ce programme.
+Il remplace l'utilsation du programme "main.py" avec les paramètres décris dans la situation B du readme.
+
+
 ### config_files
 - Dossier regroupant les fichiers permettant de générer les `cfg` pour chaques avions.
 - `fm_data_db.csv` fichier utilisé afin de récuprérer les données utiles pour faire les calculs et générer les `cfg` de chaques avions.
