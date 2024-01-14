@@ -12,7 +12,9 @@ def update_wtrti_data():
    - fm_data_db.csv : fichier contenant toutes les valeurs des avions utilisé par le programme WTRTI.
    :return:
    '''
-   os.chdir("D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\FM") # Se déplace dans le dossier des fichier csv de WTRTI
+   # Se déplace dans le dossier des fichier csv de WTRTI
+   if TERMINAL == "PC":    os.chdir("D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\FM")
+   if TERMINAL == "MAC":   print("Wrong Terminal")
    with open("fm_data_db.csv","r") as source_file:
       os.chdir("F:\Github Local\WRTI-Extractor\config_files") # Se déplace dans le dossier de config de ce programme
       new_data_file = open("fm_data_db.csv","w") # fait une copie de "fm_data_db.csv" pour ce programme
