@@ -1,3 +1,10 @@
+# Template d'utilisations
+## Regénérer les configs files
+```bash
+cd /Users/florian/Github Local/WRTI-Extractor
+python3 generate_cfg_files.py
+```
+
 # Composition du programme
 ### `Function.py`
 - Comporte l'ensemble des foonctions appelés par le programme
@@ -7,8 +14,6 @@
 Ce programme permet de regénérer les fichiers cfg pour chaques avions a partir des données du fichier "fm_data_db.csv"
 contenue dans le dossier "config_files" de ce programme.
 Il remplace l'utilsation du programme "main.py" avec les paramètres décris dans la situation B du readme.
-
-
 ### config_files
 - Dossier regroupant les fichiers permettant de générer les `cfg` pour chaques avions.
 - `fm_data_db.csv` fichier utilisé afin de récuprérer les données utiles pour faire les calculs et générer les `cfg` de chaques avions.
@@ -17,6 +22,8 @@ Il remplace l'utilsation du programme "main.py" avec les paramètres décris dan
 - Les fichiers `db_7.cfg` et `vg_33.cfg` ne sont pas indispensable mais permette de faire une sauvegarde de ces `cfg`afin d'avoir un profile spécifique pour ces avions
 ### data
 -Regroupe l'ensemble des fichiers `cfg` pour chaques avions du jeu. Chaques fichier correspond a une ligne du fichier `fm_data_db.csv`. Les noms des fichiers `cfg` sont ceux de la colonne `Name`.
+
+
 # Fonctionnement du programme.
 ## A - Mise a jour des données de WTRTI
 Pour cela, run le fichier `main.py` avec les paramètres suivants:
