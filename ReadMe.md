@@ -1,5 +1,13 @@
 # Template d'utilisations
 ## Regénérer les configs files
+### From Windows
+Dans le terminal python
+```py
+import os
+os.chdir("F:\Github Local\WRTI-Extractor")
+run generate_cfg_files.py
+```
+### From MAC OS
 ```bash
 cd /Users/florian/Github Local/WRTI-Extractor
 python3 generate_cfg_files.py
