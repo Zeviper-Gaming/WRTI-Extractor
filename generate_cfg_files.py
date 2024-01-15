@@ -27,3 +27,7 @@ func.import_data_from_dict(dico_fm_data_db)
 print("Datas writed in cfg files")
 
 print("Cfg update completed !")
+
+# Retourne au dossier parent
+if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor")
+if TERMINAL == "MAC": os.chdir("/Users/florian/Github Local/WRTI-Extractor")
