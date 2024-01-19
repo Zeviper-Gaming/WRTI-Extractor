@@ -7,11 +7,17 @@ import os
 os.chdir("F:\Github Local\WRTI-Extractor")
 run generate_cfg_files.py
 ```
+Pour copier coller les cfg dans le dossier de WTRTI
+```py
+run replace_cfg_files
+```
 ### From MAC OS
 ```bash
 cd /Users/florian/Github Local/WRTI-Extractor
 python3 generate_cfg_files.py
 ```
+## Ajouter un nouveau profil
+
 
 # Composition du programme
 ### `Function.py`
