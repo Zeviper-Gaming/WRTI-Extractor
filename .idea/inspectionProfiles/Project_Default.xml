@@ -1,0 +1,65 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="ParadoxScriptConflictingResolvedExpression" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="Project Files" level="ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptConflictingScopeContextInference" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ParadoxScriptIncorrectDynamicValueExpression" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="Project Files" level="ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptIncorrectExpression" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Project Files" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptIncorrectPathReference" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Project Files" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptIncorrectScopeFieldExpression" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="Project Files" level="ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptIncorrectScriptSyntax" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="Project Files" level="ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptIncorrectValueFieldExpression" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="Project Files" level="ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptIncorrectVariableFieldExpression" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="Project Files" level="ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptMissingExpression" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="Project Files" level="ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptMissingImage" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Project Files" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptMissingLocalisation" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Project Files" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptMissingParameter" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Project Files" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptTooManyExpression" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="Project Files" level="WEAK WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptUnresolvedExpression" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="Project Files" level="ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptUnresolvedPathReference" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="Project Files" level="ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptUnresolvedScriptedVariable" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="Project Files" level="ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptUnsetDynamicValue" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="Project Files" level="WEAK WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptUnusedDynamicValue" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="Project Files" level="WEAK WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ParadoxScriptUnusedParameter" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="Project Files" level="WEAK WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="PyPep8Inspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyPep8NamingInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+  </profile>
+</component>
