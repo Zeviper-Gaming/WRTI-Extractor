@@ -39,7 +39,7 @@ def generate_cfg_files(data_dico):
       path_source = "/Users/florian/Github Local/WRTI-Extractor/config_files"
       path_target = "/Users/florian/Github Local/WRTI-Extractor/data"
    for name in data_dico["Name"]:
-      if TERMINAL == "PC":    shutil.copy(f"{path_source}\custom.cfg",f"{path_target}\{name}.cfg")
+      if TERMINAL == "PC":    shutil.copy(f"{path_source}\0-custom.cfg",f"{path_target}\{name}.cfg")
       if TERMINAL == "MAC":   shutil.copy(f"{path_source}/0-custom.cfg",f"{path_target}/{name}.cfg")
 
 def import_data_from_dict(data_dico):
