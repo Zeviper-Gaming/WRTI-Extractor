@@ -18,7 +18,7 @@ os.chdir("config_files/")
 dico_fm_data_db = csv.Csv2Dict("fm_data_db.csv")
 print("Data load into dico")
 
-# Génere une copie de "custom.cfg" pour chaque avion selon les données de "fm_data_db.csv"
+# Génere une copie de "0-custom.cfg" pour chaque avion selon les données de "fm_data_db.csv"
 func.generate_cfg_files(dico_fm_data_db)
 print("cfg files was pasted from custom file")
 
