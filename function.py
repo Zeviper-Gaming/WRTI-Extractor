@@ -26,12 +26,13 @@ def update_wtrti_data():
 
 def generate_cfg_files(data_dico):
    '''
-   Fait une copie du fichier custom.cfg pour chaques avions enregistrés dans "fm_data_db.csv"
-   :custom.cfg:   Fichier cfg dans lequel on retrouve toutes les variables qui seront remplacé par ce programme par
+   Fait une copie du fichier 0-custom.cfg pour chaques avions enregistrés dans "fm_data_db.csv"
+   :0-custom.cfg:   Fichier cfg dans lequel on retrouve toutes les variables qui seront remplacé par ce programme par
                   les valeurs correctes pour chaques avions.
    :param data_dico:
    :return:
    '''
+   filename = "0-custom.cfg"
    if TERMINAL == "PC":
       path_source = "F:\Github Local\WRTI-Extractor\config_files" #Dossier de config avec les données
       path_target = "F:\Github Local\WRTI-Extractor\data" #Dossier regroupant les fichiers de chaques avions
@@ -39,8 +40,8 @@ def generate_cfg_files(data_dico):
       path_source = "/Users/florian/Github Local/WRTI-Extractor/config_files"
       path_target = "/Users/florian/Github Local/WRTI-Extractor/data"
    for name in data_dico["Name"]:
-      if TERMINAL == "PC":    shutil.copy(f"{path_source}\custom.cfg",f"{path_target}\{name}.cfg")
-      if TERMINAL == "MAC":   shutil.copy(f"{path_source}/custom.cfg",f"{path_target}/{name}.cfg")
+      if TERMINAL == "PC":    shutil.copy(f"{path_source}\{filename}",f"{path_target}\{name}.cfg")
+      if TERMINAL == "MAC":   shutil.copy(f"{path_source}/{filename}",f"{path_target}/{name}.cfg")
 
 def import_data_from_dict(data_dico):
    '''
