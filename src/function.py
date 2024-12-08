@@ -16,7 +16,7 @@ def update_wtrti_data():
    if TERMINAL == "PC":    os.chdir("D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\FM")
    if TERMINAL == "MAC":   print("Wrong Terminal")
    with open("fm_data_db.csv","r") as source_file:
-      os.chdir("F:\Github Local\WRTI-Extractor\config_files") # Se déplace dans le dossier de config de ce programme
+      os.chdir("/datas") # Se déplace dans le dossier de config de ce programme
       new_data_file = open("fm_data_db.csv","w") # fait une copie de "fm_data_db.csv" pour ce programme
 
       for line in source_file:
@@ -34,11 +34,11 @@ def generate_cfg_files(data_dico):
    '''
    filename = "0-custom.cfg"
    if TERMINAL == "PC":
-      path_source = "F:\Github Local\WRTI-Extractor\config_files" #Dossier de config avec les données
-      path_target = "F:\Github Local\WRTI-Extractor\data" #Dossier regroupant les fichiers de chaques avions
+      path_source = "/datas"  #Dossier de config avec les données
+      path_target = "/cfg_files"  #Dossier regroupant les fichiers de chaques avions
    elif TERMINAL == "MAC":
-      path_source = "/Users/florian/Github Local/WRTI-Extractor/config_files"
-      path_target = "/Users/florian/Github Local/WRTI-Extractor/data"
+      path_source = "/Users/florian/Github Local/WRTI-Extractor/datas"
+      path_target = "/Users/florian/Github Local/WRTI-Extractor/cfg_files"
    for name in data_dico["Name"]:
       if TERMINAL == "PC":    shutil.copy(f"{path_source}\{filename}",f"{path_target}\{name}.cfg")
       if TERMINAL == "MAC":   shutil.copy(f"{path_source}/{filename}",f"{path_target}/{name}.cfg")
@@ -46,7 +46,7 @@ def generate_cfg_files(data_dico):
 def import_data_from_dict(data_dico):
    '''
    Cette fonction récupère pour chaques avions, les données compilés dans data_dico, et va réécrire tous les fichiers
-   cfg de chaques avions du dossier "data" avec les valeurs correspondantes.
+   cfg de chaques avions du dossier "cfg_files" avec les valeurs correspondantes.
    C'est également dans cette fonction que tous les calculs sont générés afin de produire les bonnes valeurs.
    '''
    for i,name in enumerate(data_dico["Name"]):
@@ -93,8 +93,8 @@ def import_data_from_dict(data_dico):
          "rpm_2"  : rpm_2,
          "rpm_3"  : rpm_3,
       }
-      if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor\data")
-      if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/data")
+      if TERMINAL == "PC": os.chdir("/cfg_files")
+      if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/cfg_files")
       rewrite_cfg_file(f"{name}.cfg",dico_variable)
 
 def rewrite_cfg_file(filename,variables):

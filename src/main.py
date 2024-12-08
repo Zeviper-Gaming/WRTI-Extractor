@@ -5,15 +5,15 @@ import MyPack2.Saves.CSV as csv
 # Constante
 IS_UPDATE = False
 UPDATE_CFG_FILES = True
-os.chdir("F:\Github Local\WRTI-Extractor") # Ensure that the code begin in main folder
+os.chdir("/") # Ensure that the code begin in main folder
 
-# Update data or not ?
+# Update cfg_files or not ?
 if IS_UPDATE: # Permet de mettre à jour les données de WTRTI dans ce programme.
     func.update_wtrti_data()
     print("Data was update")
 
-# load wtrti data files
-os.chdir("config_files/") # Va dans les dossiers de config de ce programme
+# load wtrti cfg_files files
+os.chdir("../datas/") # Va dans les dossiers de config de ce programme
 #fixme can not load file as dict (see format of csv file (, and ;) )
 dico_fm_data_db = csv.Csv2Dict("fm_data_db.csv") # Charge les caractéristiques des avions depuis ce programme.
 print("Data load into dico")

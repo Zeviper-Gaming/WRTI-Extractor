@@ -10,7 +10,7 @@ import shutil
 # Verifie le bon terminal pour faire la MAJ des profiles dans WTRTI
 assert TERMINAL == "PC" , "Wrong terminal !! Try to use on PC instead"
 path_target_folder  = "D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\profiles"
-path_source_folder  = "F:\Github Local\WRTI-Extractor\data"
+path_source_folder  = "/cfg_files"
 
 # Liste les noms des profiles des cfg
 list_profiles = dico_fm_data_db["Name"]

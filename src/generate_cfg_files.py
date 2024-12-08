@@ -1,6 +1,6 @@
 '''
 Ce programme permet de regénérer les fichiers cfg pour chaques avions a partir des données du fichier "fm_data_db.csv"
-contenue dans le dossier "config_files" de ce programme.
+contenue dans le dossier "datas" de ce programme.
 Il remplace l'utilsation du programme "main.py" avec les paramètres décris dans la situation B du readme.
 '''
 
@@ -10,11 +10,11 @@ import MyPack2.Saves.CSV as csv
 from MyPack2.Myos import TERMINAL
 
 # S'assure que le programme commence dans le dossier parent de ce programme
-if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor")
+if TERMINAL == "PC": os.chdir("/")
 if TERMINAL == "MAC": os.chdir("/Users/florian/Github Local/WRTI-Extractor")
 
 # Charge les données de config de ce programme dans un dico
-os.chdir("config_files/")
+os.chdir("../datas/")
 dico_fm_data_db = csv.Csv2Dict("fm_data_db.csv")
 print("Data load into dico")
 
@@ -29,5 +29,5 @@ print("Datas writed in cfg files")
 print("Cfg update completed !")
 
 # Retourne au dossier parent
-if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor")
+if TERMINAL == "PC": os.chdir("/")
 if TERMINAL == "MAC": os.chdir("/Users/florian/Github Local/WRTI-Extractor")
