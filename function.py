@@ -67,14 +67,15 @@ def import_data_from_dict(data_dico):
       Vred     = str(0.90*int(Vmax))
       Vorange  = str(0.80*int(Vmax))
       Vmax     = str(0.95*int(Vmax))
-      V1       = str(250)
-      V2       = str(350)
-      Vlow     = str(150)
+      V1       = str(0.50*int(Vmax))
+      V2       = str(0.60*int(Vmax))
+      Vlow     = str(0.30*int(Vmax))
       Vg_red   = str(int(Vg)*0.8)
       rpm_1    = str(rpm_1)
       rpm_2    = str(rpm_2)
       rpm_3    = str(rpm_3)
 
+      # Packing data
       dico_variable = {
          "Vmax"   : str(Vmax),
          "Fc"     : str(Fc),
@@ -88,6 +89,7 @@ def import_data_from_dict(data_dico):
          "V1"     : V1,
          "V2"     : V2,
          "Vlow"   : Vlow,
+
          "Vd"     : str(Vd),
          "rpm_1"  : rpm_1,
          "rpm_2"  : rpm_2,
@@ -134,5 +136,15 @@ def get_flaps_crit_speed(data_dico,index):
       if int(Fd) == 1: Vd = "0"
 
    return Fc,Fd,Vc,Vd,Va
+
+def get_opt_velicities(values):
+   v_ailerons  = int(values[0].split("< ")[-1])
+   v_rudder    = int(values[1].split("< ")[-1])
+   v_elevators = int(values[2].split("< ")[-1])
+   v_radiator  = int(values[3].split("> ")[-1])
+   V1          = min(v_ailerons,v_elevators,v_rudder)*0.8
+   V2          = max(v_ailerons,v_elevators,v_rudder)*0.9
+   Vrad        = v_radiator
+   return V1,V2,Vrad
 ##################### TEST ZONE
 #update_wtrti_data()
