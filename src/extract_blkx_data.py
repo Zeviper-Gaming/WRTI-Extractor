@@ -3,47 +3,16 @@
 import os
 import json
 import pandas as pd
+from function import get_aircraft_list,match_aircraft_to_blkx
 
-# Étape 1 : Chemin vers le fichier WTRTI data et des fichiers .blkx
+
+# Chemins
 wtrti_data_path = "../datas/fm_data_db.csv"
 blkx_folder_path = "../fm_blk_files"
 destination_csv_path = "../datas/extracted_aircraft_data.csv"
 
-# Étape 3 : Lecture des avions depuis WTRTI data
-def get_aircraft_list(data_path):
-    """
-    Lit le fichier WTRTI pour récupérer la liste des avions.
-    Args:
-        data_path (str): Chemin vers le fichier WTRTI data.
-    Returns:
-        list: Liste des identifiants d'avions.
-    """
-    aircraft_list = []
-    # Lecture du CSV avec pandas
-    data = pd.read_csv(data_path)
-    aircraft_list = data["Name"].tolist()  # Colonne contenant les noms des avions
-    return aircraft_list
-
-# Étape 4 : Associer chaque avion à son fichier .blkx
-def match_aircraft_to_blkx(aircraft_list, blkx_folder):
-    """
-    Associe chaque avion à son fichier .blkx.
-    Args:
-        aircraft_list (list): Liste des identifiants d'avions.
-        blkx_folder (str): Chemin vers le dossier contenant les fichiers .blkx.
-    Returns:
-        dict: Dictionnaire {aircraft_id: chemin_vers_fichier_blkx}.
-    """
-    matches = {}
-    blkx_files = os.listdir(blkx_folder)
-    for aircraft in aircraft_list:
-        for blkx_file in blkx_files:
-            if aircraft in blkx_file:
-                matches[aircraft] = os.path.join(blkx_folder, blkx_file)
-    return matches
-
-# Étape 5 : Extraire les données des fichiers .blkx
-def extract_data_from_blkx(blkx_path):
+# Extraire les données des fichiers .blkx
+def extract_stallSpeed(blkx_path):
     """
     Extrait les données d'un fichier .blkx.
     Args:
@@ -87,7 +56,7 @@ def main():
     # Extraire les données
     extracted_data = []
     for aircraft, blkx_path in matches.items():
-        data = extract_data_from_blkx(blkx_path)
+        data = extract_stallSpeed(blkx_path)
         if data["stallSpeed"] is not None:
             found_stallSpeed += 1
         else:

@@ -1,5 +1,6 @@
 import os
 import shutil
+import pandas as pd
 from MyPack2.Myos import TERMINAL
 
 def update_wtrti_data():
@@ -136,3 +137,34 @@ def get_flaps_crit_speed(data_dico,index):
    return Fc,Fd,Vc,Vd,Va
 ##################### TEST ZONE
 #update_wtrti_data()
+
+def get_aircraft_list(data_path):
+   """
+   Lit le fichier WTRTI pour récupérer la liste des avions.
+   Args:
+       data_path (str): Chemin vers le fichier WTRTI data.
+   Returns:
+       list: Liste des identifiants d'avions.
+   """
+   aircraft_list = []
+   # Lecture du CSV avec pandas
+   data = pd.read_csv(data_path)
+   aircraft_list = data["Name"].tolist()  # Colonne contenant les noms des avions
+   return aircraft_list
+
+def match_aircraft_to_blkx(aircraft_list, blkx_folder):
+   """
+   Associe chaque avion à son fichier .blkx.
+   Args:
+       aircraft_list (list): Liste des identifiants d'avions.
+       blkx_folder (str): Chemin vers le dossier contenant les fichiers .blkx.
+   Returns:
+       dict: Dictionnaire {aircraft_id: chemin_vers_fichier_blkx}.
+   """
+   matches = {}
+   blkx_files = os.listdir(blkx_folder)
+   for aircraft in aircraft_list:
+      for blkx_file in blkx_files:
+         if aircraft in blkx_file:
+            matches[aircraft] = os.path.join(blkx_folder, blkx_file)
+   return matches
