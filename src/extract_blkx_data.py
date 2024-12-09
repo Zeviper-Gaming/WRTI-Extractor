@@ -78,14 +78,26 @@ def main():
     matches = match_aircraft_to_blkx(aircraft_list, blkx_folder_path)
     print(f"{len(matches)} fichiers .blkx correspondants trouvés.")
 
+    # Variables pour compter les cas où stallSpeed est trouvé ou non
+    found_stallSpeed = 0
+    not_found_stallSpeed = 0
+
     # Extraire les données
     extracted_data = []
     for aircraft, blkx_path in matches.items():
         data = extract_data_from_blkx(blkx_path)
+        if data["stallSpeed"] is not None:
+            found_stallSpeed += 1
+        else:
+            not_found_stallSpeed += 1
         extracted_data.append({
             "aircraft": aircraft,
             "stallSpeed": data["stallSpeed"]
         })
+
+    # Logs sur les fichiers analysés
+    print(f"StallSpeed trouvé dans {found_stallSpeed} fichiers.")
+    print(f"StallSpeed non trouvé dans {not_found_stallSpeed} fichiers.")
 
     # Sauvegarder les données extraites dans un fichier CSV
     df = pd.DataFrame(extracted_data)
