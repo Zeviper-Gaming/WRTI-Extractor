@@ -7,7 +7,7 @@ import pandas as pd
 # Étape 1 : Chemin vers le fichier WTRTI data et des fichiers .blkx
 wtrti_data_path = "../datas/fm_data_db.csv"
 blkx_folder_path = "../fm_blk_files"
-
+destination_csv_path = "../datas/extracted_aircraft_data.csv"
 
 # Étape 3 : Lecture des avions depuis WTRTI data
 def get_aircraft_list(data_path):
@@ -23,7 +23,6 @@ def get_aircraft_list(data_path):
     data = pd.read_csv(data_path)
     aircraft_list = data["Name"].tolist()  # Colonne contenant les noms des avions
     return aircraft_list
-
 
 # Étape 4 : Associer chaque avion à son fichier .blkx
 def match_aircraft_to_blkx(aircraft_list, blkx_folder):
@@ -43,7 +42,6 @@ def match_aircraft_to_blkx(aircraft_list, blkx_folder):
                 matches[aircraft] = os.path.join(blkx_folder, blkx_file)
     return matches
 
-
 # Étape 5 : Extraire les données des fichiers .blkx
 def extract_data_from_blkx(blkx_path):
     """
@@ -56,11 +54,19 @@ def extract_data_from_blkx(blkx_path):
     with open(blkx_path, 'r', encoding='utf-8') as blkx_file:
         try:
             data = json.load(blkx_file)  # Supposant un format JSON-like
-            return data
+            if "Alt" in data and "stallSpeed" in data["Alt"]:
+                return {
+                    "stallSpeed": data["Alt"]["stallSpeed"][1]
+                }
+            else:
+                return {
+                    "stallSpeed": None
+                }
         except json.JSONDecodeError:
             print(f"Erreur lors de la lecture du fichier : {blkx_path}")
-            return {}
-
+            return {
+                "stallSpeed": None
+            }
 
 # Étape principale : Récupération des données pour tous les avions
 def main():
@@ -73,15 +79,18 @@ def main():
     print(f"{len(matches)} fichiers .blkx correspondants trouvés.")
 
     # Extraire les données
-    extracted_data = {}
+    extracted_data = []
     for aircraft, blkx_path in matches.items():
-        extracted_data[aircraft] = extract_data_from_blkx(blkx_path)
+        data = extract_data_from_blkx(blkx_path)
+        extracted_data.append({
+            "aircraft": aircraft,
+            "stallSpeed": data["stallSpeed"]
+        })
 
-    # Sauvegarder les données extraites dans un fichier JSON
-    with open("extracted_aircraft_data.json", "w", encoding="utf-8") as output_file:
-        json.dump(extracted_data, output_file, indent=4)
-    print("Données extraites et sauvegardées dans extracted_aircraft_data.json")
-
+    # Sauvegarder les données extraites dans un fichier CSV
+    df = pd.DataFrame(extracted_data)
+    df.to_csv(destination_csv_path, index=False)
+    print(f"Données extraites et sauvegardées dans {destination_csv_path}")
 
 if __name__ == "__main__":
     main()
