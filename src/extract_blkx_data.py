@@ -27,33 +27,18 @@ def extract_stallSpeed(blkx_path):
 
     for i, line in enumerate(lines):
         if "\"stallSpeed\"" in line:
-            try:
-                # Extraire la ligne suivante qui contient la valeur
-                speed_line = lines[i + 2]
-                stall_speed = float(speed_line.strip().strip('[],'))
-                break
-            except (IndexError, ValueError):
-                print(f"Erreur lors de l'extraction de stallSpeed dans le fichier : {blkx_path}")
+                stall_speed = float(lines[i + 2].strip().strip('[],'))
         elif "\"MinimalSpeed\"" in line:
-            try:
                 stall_speed = float(line.split(":")[1].strip().strip(","))
-                break
-            except:
-                break
-
     return {
         "stallSpeed": stall_speed
     }
 
 # Étape principale : Récupération des données pour tous les avions
 def main():
-    # Lire la liste des avions
-    aircraft_list = get_aircraft_list(wtrti_data_path)
-    print(f"{len(aircraft_list)} avions trouvés dans WTRTI data.")
-
     # Associer les avions à leurs fichiers .blkx
-    matches = match_aircraft_to_blkx(aircraft_list, blkx_folder_path)
-    print(f"{len(matches)} fichiers .blkx correspondants trouvés.")
+    blkx_files = os.listdir(blkx_folder_path)
+    print(f"{len(blkx_files)} fichiers .blkx correspondants trouvés.")
 
     # Variables pour compter les cas où stallSpeed est trouvé ou non
     found_stallSpeed = 0
@@ -61,8 +46,9 @@ def main():
 
     # Extraire les données
     extracted_data = []
-    for aircraft, blkx_path in matches.items():
-        data = extract_stallSpeed(blkx_path)
+    for filename in blkx_files:
+        aircraft = filename.split(".")[0]
+        data = extract_stallSpeed(f"{blkx_folder_path}/{aircraft}.blkx")
         if data["stallSpeed"] is not None:
             found_stallSpeed += 1
         else:
@@ -73,8 +59,11 @@ def main():
         })
 
     # Logs sur les fichiers analysés
-    print(f"StallSpeed trouvé dans {found_stallSpeed} fichiers.")
-    print(f"StallSpeed non trouvé dans {not_found_stallSpeed} fichiers.")
+    print(f"""-----------------------
+StallSpeed trouvé dans {found_stallSpeed} fichiers.
+StallSpeed non trouvé dans {not_found_stallSpeed} fichiers.
+-----------------------
+""")
 
     # Sauvegarder les données extraites dans un fichier CSV
     df = pd.DataFrame(extracted_data)
