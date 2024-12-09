@@ -22,3 +22,26 @@ def extract_stallSpeed(blkx_path):
     return {
         "stallSpeed": stall_speed
     }
+
+def extract_effectiveSpeed(blkx_path):
+
+    with open(blkx_path, 'r', encoding='utf-8') as blkx_file:
+        lines = blkx_file.readlines()
+
+    AileronEffectiveSpeed = None
+    ElevatorsEffectiveSpeed = None
+
+    for i, line in enumerate(lines):
+        if "\"AileronEffectiveSpeed\"" in line:
+            AileronEffectiveSpeed = float(line.split(":")[1].strip().strip(","))
+        if "\"ElevatorsEffectiveSpeed\"" in line: #fixme pb format de lignes
+            try: ElevatorsEffectiveSpeed = float(line.split(":")[1].strip().strip(","))
+            except: ElevatorsEffectiveSpeed = float(lines[i+1].strip().strip(","))
+
+        AileronEffectiveSpeed = truncDecimal(AileronEffectiveSpeed,0)
+        ElevatorsEffectiveSpeed = truncDecimal(ElevatorsEffectiveSpeed,0)
+
+    return {
+            "AileronEffectiveSpeed" : AileronEffectiveSpeed,
+            "ElevatorsEffectiveSpeed" : ElevatorsEffectiveSpeed
+        }

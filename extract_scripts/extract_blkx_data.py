@@ -1,7 +1,7 @@
 # Base pour le programme d'extraction de données des avions
 
 import os
-from extract_function import extract_stallSpeed  # Import de la fonction depuis un autre script
+from extract_function import *  # Import de la fonction depuis un autre script
 from MyPack2.Saves.CSV import Dict2CSV  # Import de la fonction Dict2CSV
 
 # Chemins
@@ -12,7 +12,9 @@ destination_csv_path = "../datas/extracted_aircraft_data.csv"
 # Initialisation du dictionnaire global pour stocker les données
 extracted_data_dict = {
     "aircraft": [],
-    "stallSpeed": []
+    "stallSpeed": [],
+    "AileronEffectiveSpeed": [],
+    "ElevatorsEffectiveSpeed": []
 }
 
 # Ouvre la liste des fichiers .blkx
@@ -25,18 +27,20 @@ not_found_stallSpeed = 0
 
 # Extraire les données
 for filename in blkx_files:
+    # Extract aircraft name
     aircraft = filename.split(".")[0]
-    data = extract_stallSpeed(f"{blkx_folder_path}/{filename}")
-
-    # Mettre à jour le dictionnaire global
     extracted_data_dict["aircraft"].append(aircraft)
-    extracted_data_dict["stallSpeed"].append(data["stallSpeed"])
 
-    # Comptabiliser les cas trouvés ou non
-    if data["stallSpeed"] is not None:
-        found_stallSpeed += 1
-    else:
-        not_found_stallSpeed += 1
+    # Extract stall speed
+    data = extract_stallSpeed(f"{blkx_folder_path}/{filename}")
+    extracted_data_dict["stallSpeed"].append(data["stallSpeed"])
+    if data["stallSpeed"] is not None:  found_stallSpeed += 1
+    else:                               not_found_stallSpeed += 1
+
+    # Extract effective speed
+    data = extract_effectiveSpeed(f"{blkx_folder_path}/{filename}")
+    extracted_data_dict["AileronEffectiveSpeed"].append(data["AileronEffectiveSpeed"])
+    extracted_data_dict["ElevatorsEffectiveSpeed"].append(data["ElevatorsEffectiveSpeed"])
 
 # Logs sur les fichiers analysés
 print(f"""-----------------------
