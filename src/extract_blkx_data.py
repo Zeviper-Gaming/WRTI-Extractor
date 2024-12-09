@@ -51,22 +51,24 @@ def extract_data_from_blkx(blkx_path):
     Returns:
         dict: Données extraites.
     """
+    stall_speed = None
+
     with open(blkx_path, 'r', encoding='utf-8') as blkx_file:
-        try:
-            data = json.load(blkx_file)  # Supposant un format JSON-like
-            if "Alt" in data and "stallSpeed" in data["Alt"]:
-                return {
-                    "stallSpeed": data["Alt"]["stallSpeed"][1]
-                }
-            else:
-                return {
-                    "stallSpeed": None
-                }
-        except json.JSONDecodeError:
-            print(f"Erreur lors de la lecture du fichier : {blkx_path}")
-            return {
-                "stallSpeed": None
-            }
+        lines = blkx_file.readlines()
+
+    for i, line in enumerate(lines):
+        if "\"stallSpeed\"" in line:
+            try:
+                # Extraire la ligne suivante qui contient la valeur
+                speed_line = lines[i + 2]
+                stall_speed = float(speed_line.strip().strip('[],'))
+                break
+            except (IndexError, ValueError):
+                print(f"Erreur lors de l'extraction de stallSpeed dans le fichier : {blkx_path}")
+
+    return {
+        "stallSpeed": stall_speed
+    }
 
 # Étape principale : Récupération des données pour tous les avions
 def main():
