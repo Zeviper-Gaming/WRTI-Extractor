@@ -34,6 +34,12 @@ def extract_stallSpeed(blkx_path):
                 break
             except (IndexError, ValueError):
                 print(f"Erreur lors de l'extraction de stallSpeed dans le fichier : {blkx_path}")
+        elif "\"MinimalSpeed\"" in line:
+            try:
+                stall_speed = float(line.split(":")[1].strip().strip(","))
+                break
+            except:
+                break
 
     return {
         "stallSpeed": stall_speed
