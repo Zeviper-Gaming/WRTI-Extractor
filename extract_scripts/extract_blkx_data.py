@@ -6,7 +6,7 @@ from MyPack2.Saves.CSV import Dict2CSV  # Import de la fonction Dict2CSV
 
 # Chemins
 wtrti_data_path = "../datas/fm_data_db.csv"
-blkx_folder_path = "../fm_blk_files"
+blkx_folder_path = "../datas/fm_blk_files"
 destination_csv_path = "../datas/extracted_aircraft_data.csv"
 
 # Initialisation du dictionnaire global pour stocker les données
