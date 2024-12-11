@@ -14,6 +14,7 @@ extracted_data_dict = {
     "aircraft": [],
     "stallSpeed": [],
     "AileronEffectiveSpeed": [],
+    "RudderEffectiveSpeed": [],
     "ElevatorsEffectiveSpeed": []
 }
 
@@ -35,12 +36,13 @@ for filename in json_files:
     stallSpeed = extract_stallSpeed(json_data,filename)
     extracted_data_dict["stallSpeed"].append(stallSpeed)
 
-'''
+
     # Extract effective speed
-    data = extract_effectiveSpeed(json_data)
+    data = extract_effectiveSpeed(json_data,filename)
     extracted_data_dict["AileronEffectiveSpeed"].append(data["AileronEffectiveSpeed"])
+    extracted_data_dict["RudderEffectiveSpeed"].append(data["RudderEffectiveSpeed"])
     extracted_data_dict["ElevatorsEffectiveSpeed"].append(data["ElevatorsEffectiveSpeed"])
-'''
+
 
 
 # Sauvegarder les données du dictionnaire dans un fichier CSV
