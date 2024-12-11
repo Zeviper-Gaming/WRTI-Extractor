@@ -32,7 +32,7 @@ for filename in json_files:
     extracted_data_dict["aircraft"].append(aircraft)
 
     # Extract stall speed
-    stallSpeed = extract_stallSpeed(json_data)
+    stallSpeed = extract_stallSpeed(json_data,filename)
     extracted_data_dict["stallSpeed"].append(stallSpeed)
 
 '''

@@ -1,4 +1,5 @@
 import os
+import json
 
 def search_for_keyword_in_files(keyword, directory="."):
     """
@@ -25,6 +26,11 @@ def search_for_keyword_in_files(keyword, directory="."):
                 print(f"Erreur lors de la lecture du fichier {filename}: {e}")
 
     return matching_files
+
+def load_json(filename):
+    with open(f"F:/Github Local/WRTI-Extractor/datas/json_files/{filename}.json", 'r') as file:
+        json_data = json.load(file)
+        print("data loaded")
 
 if __name__ == "__main__":
     keyword = "MinimalSpeed"
