@@ -1,12 +1,12 @@
 # Base pour le programme d'extraction de données des avions
-
+import json
 import os
 from extract_function import *  # Import de la fonction depuis un autre script
 from MyPack2.Saves.CSV import Dict2CSV  # Import de la fonction Dict2CSV
 
 # Chemins
 wtrti_data_path = "../datas/fm_data_db.csv"
-blkx_folder_path = "../datas/fm_blk_files"
+json_folder_path = "../datas/json_files"
 destination_csv_path = "../datas/extracted_aircraft_data.csv"
 
 # Initialisation du dictionnaire global pour stocker les données
@@ -17,37 +17,31 @@ extracted_data_dict = {
     "ElevatorsEffectiveSpeed": []
 }
 
-# Ouvre la liste des fichiers .blkx
-blkx_files = os.listdir(blkx_folder_path)
-print(f"{len(blkx_files)} fichiers .blkx trouvés.")
-
-# Variables pour compter les cas où stallSpeed est trouvé ou non
-found_stallSpeed = 0
-not_found_stallSpeed = 0
+# Ouvre la liste des fichiers .json
+json_files = os.listdir(json_folder_path)
+print(f"{len(json_files)} fichiers .json trouvés.")
 
 # Extraire les données
-for filename in blkx_files:
+for filename in json_files:
+    # Open file
+    with open(f"{json_folder_path}/{filename}", 'r') as file:
+        json_data = json.load(file)
+
     # Extract aircraft name
     aircraft = filename.split(".")[0]
     extracted_data_dict["aircraft"].append(aircraft)
 
     # Extract stall speed
-    data = extract_stallSpeed(f"{blkx_folder_path}/{filename}")
-    extracted_data_dict["stallSpeed"].append(data["stallSpeed"])
-    if data["stallSpeed"] is not None:  found_stallSpeed += 1
-    else:                               not_found_stallSpeed += 1
+    stallSpeed = extract_stallSpeed(json_data)
+    extracted_data_dict["stallSpeed"].append(stallSpeed)
 
+'''
     # Extract effective speed
-    data = extract_effectiveSpeed(f"{blkx_folder_path}/{filename}")
+    data = extract_effectiveSpeed(json_data)
     extracted_data_dict["AileronEffectiveSpeed"].append(data["AileronEffectiveSpeed"])
     extracted_data_dict["ElevatorsEffectiveSpeed"].append(data["ElevatorsEffectiveSpeed"])
+'''
 
-# Logs sur les fichiers analysés
-print(f"""-----------------------
-StallSpeed trouvé dans {found_stallSpeed} fichiers.
-StallSpeed non trouvé dans {not_found_stallSpeed} fichiers.
------------------------
-""")
 
 # Sauvegarder les données du dictionnaire dans un fichier CSV
 Dict2CSV(extracted_data_dict, destination_csv_path)

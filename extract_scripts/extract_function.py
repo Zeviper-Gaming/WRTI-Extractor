@@ -1,47 +1,27 @@
+import json
+import os
 from MyPack2.Utilities import truncDecimal
 
-def extract_stallSpeed(blkx_path):
+
+def extract_stallSpeed(json_data):
     """
-    Extrait les données d'un fichier .blkx.
+    Extrait la valeur de stallSpeed ou MinimalSpeed depuis un JSON.
     Args:
-        blkx_path (str): Chemin vers le fichier .blkx.
+        json_data (dict): Données JSON chargées.
     Returns:
-        dict: Données extraites.
+        float: La valeur de la vitesse de décrochage.
     """
-    stall_speed = 150
 
-    with open(blkx_path, 'r', encoding='utf-8') as blkx_file:
-        lines = blkx_file.readlines()
+    try:
+        # Recherche dans les différentes clés possibles
+        stall_speed = json_data["Passport"]["Alt"]["stallSpeed"][1]
+        if stall_speed is None:
+            stall_speed = json_data.get("MinimalSpeed")
 
-    for i, line in enumerate(lines):
-        if "\"stallSpeed\"" in line:
-                stall_speed = float(lines[i + 2].strip().strip('[],'))
-        elif "\"MinimalSpeed\"" in line:
-                stall_speed = float(line.split(":")[1].strip().strip(","))
-        stall_speed = truncDecimal(stall_speed,0)
-    return {
-        "stallSpeed": stall_speed
-    }
+        if stall_speed is None:
+            raise ValueError("stallSpeed ou MinimalSpeed non trouvé")
 
-def extract_effectiveSpeed(blkx_path):
-
-    with open(blkx_path, 'r', encoding='utf-8') as blkx_file:
-        lines = blkx_file.readlines()
-
-    AileronEffectiveSpeed = None
-    ElevatorsEffectiveSpeed = None
-
-    for i, line in enumerate(lines):
-        if "\"AileronEffectiveSpeed\"" in line:
-            AileronEffectiveSpeed = float(line.split(":")[1].strip().strip(","))
-        if "\"ElevatorsEffectiveSpeed\"" in line: #fixme pb format de lignes
-            try: ElevatorsEffectiveSpeed = float(line.split(":")[1].strip().strip(","))
-            except: ElevatorsEffectiveSpeed = float(lines[i+1].strip().strip(","))
-
-        AileronEffectiveSpeed = truncDecimal(AileronEffectiveSpeed,0)
-        ElevatorsEffectiveSpeed = truncDecimal(ElevatorsEffectiveSpeed,0)
-
-    return {
-            "AileronEffectiveSpeed" : AileronEffectiveSpeed,
-            "ElevatorsEffectiveSpeed" : ElevatorsEffectiveSpeed
-        }
+        return truncDecimal(stall_speed,0)
+    except Exception as e:
+        print(f"Erreur lors de l'extraction de la stallSpeed: {e}")
+        return None
