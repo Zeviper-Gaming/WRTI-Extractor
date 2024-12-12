@@ -15,7 +15,10 @@ extracted_data_dict = {
     "stallSpeed": [],
     "AileronEffectiveSpeed": [],
     "RudderEffectiveSpeed": [],
-    "ElevatorsEffectiveSpeed": []
+    "ElevatorsEffectiveSpeed": [],
+    "Altitude0": [],
+    "Altitude1": [],
+    "Altitude2": [],
 }
 
 # Ouvre la liste des fichiers .json
@@ -43,6 +46,10 @@ for filename in json_files:
     extracted_data_dict["RudderEffectiveSpeed"].append(data["RudderEffectiveSpeed"])
     extracted_data_dict["ElevatorsEffectiveSpeed"].append(data["ElevatorsEffectiveSpeed"])
 
+    # Extract compressor Altitudes
+    extracted_data_dict["Altitude0"].append(extract_compressorStage(json_data,filename)[0])
+    extracted_data_dict["Altitude1"].append(extract_compressorStage(json_data,filename)[1])
+    extracted_data_dict["Altitude2"].append(extract_compressorStage(json_data,filename)[2])
 
 
 # Sauvegarder les données du dictionnaire dans un fichier CSV

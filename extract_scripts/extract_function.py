@@ -79,9 +79,30 @@ def extract_effectiveSpeed(json_data, filename):
             "ElevatorsEffectiveSpeed": truncDecimal(ElevatorsEffectiveSpeed, 0)
         }
     except Exception as e:
-        print(f"Erreur lors de l'extraction des vitesses effectives dans {filename}: {e}")
+        # print(f"Erreur lors de l'extraction des vitesses effectives dans {filename}: {e}")
         return {
             "AileronEffectiveSpeed": None,
             "RudderEffectiveSpeed": None,
             "ElevatorsEffectiveSpeed": None
         }
+
+def extract_compressorStage(json_data, filename):
+    CompressorAlt1 = 0
+    CompressorAlt2 = 0
+    CompressorAlt3 = 0
+
+    try:
+        try:    CompressorData = json_data["EngineType0"]["Compressor"]
+        except: CompressorData = json_data["Engine0"]["Compressor"]
+
+        if "Altitude0" in CompressorData:
+            CompressorAlt1 = CompressorData["Altitude0"]
+        if "Altitude1" in CompressorData:
+            CompressorAlt2 = CompressorData["Altitude1"]
+        if "Altitude2" in CompressorData:
+            CompressorAlt3 = CompressorData["Altitude2"]
+    except:
+        print(f"Données de compresseur non trouvé pour: {filename}")
+
+    output = [CompressorAlt1,CompressorAlt2,CompressorAlt3]
+    return output
