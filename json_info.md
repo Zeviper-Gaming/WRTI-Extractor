@@ -2,6 +2,120 @@
 
 Ce document présente une description succincte et technique des différentes caractéristiques trouvées dans les fichiers JSON des avions. Les explications sont basées sur des notions d'aéronautique appliquées aux jeux vidéo, en utilisant les données disponibles.
 
+# Analyse des caractéristiques techniques de l'avion
+
+## Contrôles de vol
+
+### AileronEffectiveSpeed
+- **Valeur** : 370.0
+- **Description** : Vitesse minimale où les ailerons deviennent pleinement opérationnels, influençant la maniabilité latérale.
+
+### RudderEffectiveSpeed
+- **Valeur** : 400.0
+- **Description** : Vitesse minimale où le gouvernail est pleinement fonctionnel, affectant la capacité de virage.
+
+### ElevatorsEffectiveSpeed
+- **Valeur** : [390.0, 390.0]
+- **Description** : Vitesse minimale pour un contrôle optimal en tangage, indiquée pour différentes configurations.
+
+### AlphaAileronMin, AlphaRudderMin, AlphaElevatorMin
+- **Valeur** : 0.1 (pour chacun)
+- **Description** : Angle d'incidence minimal pour maintenir l'efficacité des ailerons, du gouvernail et des ascenseurs.
+
+## Trainée et portance
+
+### lineClCoeff
+- **Valeur** : Non spécifiée dans ce fichier.
+- **Description** : Coefficient de portance linéaire, essentiel pour la portance avant le décrochage.
+
+### AfterCritParabAngle
+- **Valeur** : Non spécifiée dans ce fichier.
+- **Description** : Angle critique où la portance commence à décroître de manière non linéaire (décrochage).
+
+### AfterCritDeclineCoeff
+- **Valeur** : Non spécifiée dans ce fichier.
+- **Description** : Pente de diminution de la portance après le décrochage.
+
+## Vitesse et limitations
+
+### MaxSpeedNearGround
+- **Valeur** : 549.972 km/h
+- **Description** : Vitesse maximale atteignable près du sol.
+
+### MaxSpeedAtAltitude
+- **Valeur** : 549.0 km/h
+- **Description** : Vitesse maximale atteignable à une altitude spécifiée.
+
+### VneControl
+- **Valeur** : 800.0
+- **Description** : Vitesse maximale structurelle ("Never Exceed Speed"), au-delà de laquelle des dommages sont probables.
+
+## Configuration des volets
+
+### FlapsAngle
+- **Valeur** : 60.0 degrés
+- **Description** : Angle maximal de déploiement des volets, influençant la portance lors de l'atterrissage ou du décollage.
+
+### dvFlapsIn et dvFlapsOut
+- **Valeurs** : [150.0, 280.0, 0.15, 0.18] (in), [150.0, 280.0, 0.15, 0.12] (out)
+- **Description** : Caractérise le comportement des volets lors de leur déploiement (entrée et sortie) selon des vitesses spécifiques.
+
+## Inertie et moments
+
+### MomentOfInertia
+- **Valeur** : [8424.0, 16722.0, 9172.0]
+- **Description** : Moments d'inertie selon les axes de roulis, tangage et lacet, influençant la stabilité de l'avion.
+
+## Dimensions
+
+### Length
+- **Valeur** : 8.6 m
+- **Description** : Longueur totale de l'avion.
+
+### WingPlane
+- **Valeurs** :
+  - Envergure : 10.2 m
+  - Angle : 0.0°
+  - Surfaces : Gauche (intérieure : 3.4, médiane : 2.5, extérieure : 2.085), Droite (similaires)
+- **Description** : Caractéristiques de l'aile, déterminant la portance et la traînée.
+
+## Configurations avancées
+
+### AllowStrongControlsRestrictions
+- **Valeur** : true
+- **Description** : Active des restrictions strictes des commandes en fonction des conditions de vol.
+
+### AvailableControls
+- **Valeurs** :
+  - **Ailerons** : Présents, sans trim
+  - **Elevator** : Présent avec trim
+  - **Rudder** : Présent avec trim
+  - **Airbrakes** : Non présents
+- **Description** : Indique la disponibilité des contrôles principaux et accessoires de l'avion.
+
+## Moteur
+
+### EngineType0
+- **Type** : Inline, 12 cylindres
+- **Masse** : 515.0 kg
+- **Puissance** : 820 ch
+- **Description** : Moteur principal refroidi à l'eau, optimisé pour des performances fiables à différentes vitesses et altitudes.
+
+## Masse et charges
+
+### EmptyMass
+- **Valeur** : 2036.0 kg
+- **Description** : Masse à vide de l'avion sans carburant ni munitions.
+
+### Takeoff
+- **Valeur** : 2760.0 kg
+- **Description** : Masse maximale autorisée au décollage, incluant le carburant et l'armement.
+
+---
+
+Ce fichier est une première analyse détaillée. Pour des détails supplémentaires ou une clarification, veuillez indiquer les sections à développer.
+
+
 ## Contrôles de vol
 
 ### `AileronEffectiveSpeed`
