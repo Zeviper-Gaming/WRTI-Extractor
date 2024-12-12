@@ -1,43 +1,94 @@
-Les paramètres du bloc `FlapsPolar0` dans les fichiers JSON du Dewoitine D.520 modélisent les caractéristiques aérodynamiques de l'avion en fonction de la position des volets. Voici une description détaillée de chaque paramètre :
+# Caractéristiques techniques des avions
 
-- **`Flaps`** : Angle de déploiement des volets en degrés. Une valeur de `0.0` indique que les volets sont rentrés.
+Ce document présente une description succincte et technique des différentes caractéristiques trouvées dans les fichiers JSON des avions. Les explications sont basées sur des notions d'aéronautique appliquées aux jeux vidéo, en utilisant les données disponibles.
 
-- **`OswaldsEfficiencyNumber`** : Facteur d'efficacité d'Oswald, représentant l'efficacité de l'aile en termes de traînée induite. Une valeur de `0.8` est typique pour des avions avec une efficacité aérodynamique raisonnable.
+## Contrôles de vol
 
-- **`lineClCoeff`** : Pente de la courbe de portance en fonction de l'angle d'attaque. Une valeur de `0.08` indique l'augmentation du coefficient de portance par degré d'angle d'attaque.
+### `AileronEffectiveSpeed`
+Vitesse efficace des ailerons. Cette valeur correspond à la vitesse minimale à partir de laquelle les ailerons deviennent pleinement opérationnels. Elle influence la maniabilité latérale de l'avion.
 
-- **`AfterCritParabAngle`** : Angle d'attaque critique après lequel la portance commence à décroître de manière parabolique. Une valeur de `4.0` degrés suggère un décrochage progressif après cet angle.
+### `RudderEffectiveSpeed`
+Vitesse efficace du gouvernail. Similaire à celle des ailerons, elle définit la vitesse à partir de laquelle le gouvernail devient pleinement fonctionnel, affectant la capacité de l'avion à tourner.
 
-- **`AfterCritDeclineCoeff`** : Coefficient de déclin de la portance après l'angle critique. Une valeur de `0.015` indique la rapidité avec laquelle la portance diminue après le décrochage.
+### `ElevatorsEffectiveSpeed`
+Vitesse efficace des ascenseurs. Détermine la vitesse minimale pour un contrôle optimal en tangage. Peut être représentée par une valeur unique ou des listes pour des configurations spécifiques.
 
-- **`AfterCritMaxDistanceAngle`** : Angle maximal après l'angle critique où la portance continue de décroître. Une valeur de `36.0` degrés indique une large plage post-décrochage.
+### `AlphaAileronMin`, `AlphaRudderMin`, `AlphaElevatorMin`
+Angles d'incidence minimaux pour lesquels les ailerons, le gouvernail et les ascenseurs restent efficaces. Ils définissent la plage utile pour le contrôle en fonction de l'angle d'attaque.
 
-- **`CxAfterCoeff`** : Coefficient de traînée additionnelle après l'angle critique. Une valeur de `0.01` ajoute une traînée supplémentaire après le décrochage.
+## Trainée et portance
 
-- **`ClAfterCritHigh`** et **`ClAfterCritLow`** : Coefficients de portance maximum et minimum après l'angle critique. Des valeurs de `0.89` et `-0.89` indiquent la portance résiduelle après le décrochage.
+### `lineClCoeff`
+Coefficient de portance linéaire. Définit la contribution à la portance en fonction de l'angle d'attaque dans le domaine linéaire avant le décrochage.
 
-- **`MachFactor`** : Facteur influençant les caractéristiques aérodynamiques en fonction du nombre de Mach. Une valeur de `3` suggère une sensibilité modérée aux effets de compressibilité.
+### `AfterCritParabAngle`
+Angle d'attaque critique après lequel la portance décroît de manière non linéaire. Exprime le début du décrochage.
 
-- **`MachCrit1` à **`MachCrit7`** : Nombres de Mach critiques pour différentes configurations ou conditions de vol. Ces valeurs, variant entre `0.1` et `0.68`, définissent les points où des changements aérodynamiques significatifs se produisent.
+### `AfterCritDeclineCoeff`
+Coefficient décrivant la pente de diminution de la portance après l'angle critique. Une valeur faible indique une transition douce.
 
-- **`MachMax1` à **`MachMax7`** : Nombres de Mach maximums associés à chaque Mach critique. Des valeurs allant de `0.7` à `1.5` indiquent les limites supérieures pour chaque régime.
+### `AfterCritMaxDistanceAngle`
+Angle maximum où la portance continue de décroître après le décrochage initial. Permet de déterminer l'ampleur de la zone post-décrochage.
 
-- **`MultMachMax1` à **`MultMachMax7`** : Multiplicateurs appliqués aux coefficients aérodynamiques au-delà de chaque Mach critique. Ces valeurs ajustent les performances en fonction de la vitesse.
+### `CxAfterCoeff`
+Coefficient de traînée additionnelle après le décrochage. Plus ce coefficient est élevé, plus la traînée augmente rapidement au-delà de l'angle critique.
 
-- **`MultLineCoeff1` à **`MultLineCoeff7`** : Coefficients modifiant la pente de la courbe de portance en fonction du nombre de Mach. Ils ajustent la réactivité de l'aile à différents régimes de vitesse.
+### `ClAfterCritHigh` et `ClAfterCritLow`
+Coefficients de portance maximaux et minimaux après l'angle critique. Ces valeurs définissent la portance résiduelle après le décrochage.
 
-- **`MultLimit1` à **`MultLimit7`** : Limites supérieures pour l'application des multiplicateurs précédents. Ils définissent les plages de vitesse où les ajustements sont pertinents.
+## Vitesse et limitations
 
-- **`CombinedCl`** : Indicateur booléen spécifiant si les coefficients de portance sont combinés ou séparés pour différentes configurations. `false` indique qu'ils sont traités séparément.
+### `MachCrit1` à `MachCrit7`
+Nombres de Mach critiques représentant les régimes de vitesse où des phénomènes de compressibilité commencent à influencer les caractéristiques aérodynamiques.
 
-- **`ClToCmByMach`** : Tableau définissant la variation du coefficient de moment en fonction du coefficient de portance et du nombre de Mach. Les valeurs `[0.0, 0.0]` suggèrent aucune variation spécifique.
+### `MachMax1` à `MachMax7`
+Nombres de Mach maximums pour chaque régime critique, définissant les limites opérationnelles de l'avion en termes de vitesse.
 
-- **`Cl0`** : Coefficient de portance à angle d'attaque nul. Une valeur de `0.12` indique une portance positive même sans incidence.
+### `MultMachMax1` à `MultMachMax7`
+Facteurs multiplicateurs ajustant les coefficients aérodynamiques au-delà de chaque Mach critique.
 
-- **`alphaCritHigh`** et **`alphaCritLow`** : Angles d'attaque critiques supérieurs et inférieurs. Des valeurs de `18.0` et `-12.0` degrés définissent les limites avant le décrochage.
+### `MultLineCoeff1` à `MultLineCoeff7`
+Coefficients modifiant la pente de la courbe de portance en fonction du nombre de Mach. Ces ajustements influencent la maniabilité à haute vitesse.
 
-- **`ClCritHigh`** et **`ClCritLow`** : Coefficients de portance maximaux positifs et négatifs aux angles critiques. Des valeurs de `1.32` et `-0.72` indiquent la portance maximale atteignable.
+### `VneControl`
+Vitesse maximale autorisée ("Never Exceed Speed"). Dépasser cette vitesse entraîne des risques structurels.
 
-- **`CdMin`** : Coefficient de traînée minimal. Une valeur de `0.01` reflète une traînée de base faible, suggérant une conception aérodynamique efficace.
+## Configuration des volets
 
-Ces paramètres sont essentiels pour modéliser avec précision le comportement en vol du Dewoitine D.520 dans une simulation, en tenant compte des effets des volets et des variations de vitesse. 
+### `FlapsPolar0` et `FlapsPolar1`
+Décrivent les caractéristiques aérodynamiques avec différentes configurations de volets (rétractés ou déployés). Ces données incluent :
+- `Flaps` : Position des volets (ex. 0.0 pour rétractés, 1.0 pour déployés).
+- `OswaldsEfficiencyNumber` : Indicateur d'efficacité globale des ailes.
+- `Cl0` : Coefficient de portance initial.
+- `CdMin` : Coefficient de traînée minimal.
+
+## Inertie et moments
+
+### `MomentOfInertia`
+Définit les moments d'inertie selon les trois axes (roulis, tangage et lacet). Ces valeurs influencent la stabilité et la réactivité aux commandes.
+
+## Dimensions
+
+### `WingPlane`
+Caractéristiques de l'aile, incluant :
+- `Span` : Envergure.
+- `Angle` : Angle d'inclinaison.
+- `Areas` : Répartition des surfaces (intérieure, médiane, extérieure).
+
+### `FuselagePlane`
+Caractéristiques du fuselage, telles que :
+- `Areas.Main` : Surface principale affectant la traînée longitudinale.
+- `Polar` : Polaire aérodynamique spécifique au fuselage.
+
+## Configurations avancées
+
+### `AllowStrongControlsRestrictions`
+Permet ou non des restrictions strictes des commandes en fonction des conditions de vol (ex. haute vitesse).
+
+### `AvailableControls`
+Indique les systèmes disponibles :
+- Contrôle des volets, ailerons, gouvernail, etc.
+- Présence d'airbrakes ou autres systèmes spécifiques.
+
+Ce document est une synthèse pour mieux comprendre les caractéristiques des avions et leurs implications en aéronautique virtuelle.
+
