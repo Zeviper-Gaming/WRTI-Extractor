@@ -1,4 +1,4 @@
-aircraft,stallSpeed,AileronEffectiveSpeed,RudderEffectiveSpeed,ElevatorsEffectiveSpeed,Altitude0,Altitude1,Altitude2
+aircraft,stallSpeed,AileronEffectiveSpeed,RudderEffectiveSpeed,ElevatorsEffectiveSpeed,CompressorAlt0,CompressorAlt1,CompressorAlt2
 a-10a_early,176,550,650,500,8000.0,0,0
 a-10a_late,176,550,650,500,8000.0,0,0
 a-10c,176,550,650,500,8000.0,0,0

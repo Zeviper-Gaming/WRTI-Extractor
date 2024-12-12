@@ -106,3 +106,6 @@ def extract_compressorStage(json_data, filename):
 
     output = [CompressorAlt1,CompressorAlt2,CompressorAlt3]
     return output
+
+def extract_MachCrit(json_data, filename):
+    print("")
