@@ -54,11 +54,6 @@ def import_data_from_dict(data_dico):
    C'est également dans cette fonction que tous les calculs sont générés afin de produire les bonnes valeurs.
    '''
    for i,name in enumerate(data_dico["Name"]):
-      # Vmax
-      if ":" not in str(data_dico["CritAirSpd"][i]):
-         Vmax  = data_dico["CritAirSpd"][i]
-      else:
-         Vmax  = data_dico["CritAirSpd"][i].split(":")[-1]
       # Flaps angles and critical speed
       Fc,Fd,Vc,Vd,Va = get_flaps_crit_speed(data_dico,i)
       # RPM warning #todo theses variables are not used (rpm_1,rpm_2,rpm_3)
@@ -68,24 +63,18 @@ def import_data_from_dict(data_dico):
       # Gear critical speed
       Vg       = data_dico["CritGearSpd"][i]
 
-      Vred     = str(0.90*int(Vmax))
-      Vorange  = str(0.80*int(Vmax))
-      Vmax     = str(0.95*int(Vmax))
       Vg_red   = str(int(Vg)*0.8)
       rpm_1    = str(rpm_1)
       rpm_2    = str(rpm_2)
       rpm_3    = str(rpm_3)
 
       dico_variable = {
-         "Vmax"   : str(Vmax),
          "Fc"     : str(Fc),
          "Fd"     : str(Fd),
          "Vc"     : str(Vc),
          "Va"     : str(Va),
          "Vg_red" : Vg_red,
          "Vg"     : str(Vg),
-         "Vred"   : Vred,
-         "Vorange": Vorange,
          "Vd"     : str(Vd),
          "rpm_1"  : rpm_1,
          "rpm_2"  : rpm_2,
@@ -101,13 +90,16 @@ def import_data_from_extracted_data(data_dico):
       EffectiveSpeed = [data_dico["AileronEffectiveSpeed"][i],
                         data_dico["RudderEffectiveSpeed"][i],
                         data_dico["ElevatorsEffectiveSpeed"][i]]
-      Vlow  = truncDecimal(data_dico["stallSpeed"][i],0)
-      V1    = truncDecimal(0.90*min(EffectiveSpeed),0)
-      V2    = truncDecimal(1.10*max(EffectiveSpeed),0)
+      Vred  = truncDecimal(data_dico["stallSpeed"][i],0) # Vitesse de décrochage
+      Vlow  = Vred + 50  # Warning décrochage
+      V1    = truncDecimal(min(EffectiveSpeed),0) # Seuil vitesse efficace bas
+      V2    = truncDecimal(max(EffectiveSpeed),0) # Seuil vitesse efficace haut
       dico_variable = {
+         "Vred"   : str(Vred),
          "Vlow"   : str(Vlow),
-         "V1"   : str(V1),
-         "V2"   : str(V2)
+         "V1"     : str(V1),
+         "V2"     : str(V2),
+
       }
 
       if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor\datas\cfg_files")
