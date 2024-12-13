@@ -24,6 +24,7 @@ print("cfg files was pasted from custom file")
 
 # Remplace les variables dans chaques cfg par les données calculés.
 func.import_data_from_dict(dico_fm_data_db)
+func.import_data_from_extracted_data(dico_fm_data_db)
 print("Datas writed in cfg files")
 
 print("Cfg update completed !")

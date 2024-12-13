@@ -68,9 +68,6 @@ def import_data_from_dict(data_dico):
       Vred     = str(0.90*int(Vmax))
       Vorange  = str(0.80*int(Vmax))
       Vmax     = str(0.95*int(Vmax))
-      V1       = str(250)
-      V2       = str(350)
-      Vlow     = str(150)
       Vg_red   = str(int(Vg)*0.8)
       rpm_1    = str(rpm_1)
       rpm_2    = str(rpm_2)
@@ -86,9 +83,6 @@ def import_data_from_dict(data_dico):
          "Vg"     : str(Vg),
          "Vred"   : Vred,
          "Vorange": Vorange,
-         "V1"     : V1,
-         "V2"     : V2,
-         "Vlow"   : Vlow,
          "Vd"     : str(Vd),
          "rpm_1"  : rpm_1,
          "rpm_2"  : rpm_2,
@@ -97,6 +91,25 @@ def import_data_from_dict(data_dico):
       if TERMINAL == "PC": os.chdir("/cfg_files")
       if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/cfg_files")
       rewrite_cfg_file(f"{name}.cfg",dico_variable)
+
+def import_data_from_extracted_data(data_dico):
+   for i, name in enumerate(data_dico["aircraft"]):
+      EffectiveSpeed = [data_dico["AileronEffectiveSpeed"][i],
+                        data_dico["RudderEffectiveSpeed"][i],
+                        data_dico["ElevatorsEffectiveSpeed"][i]]
+      Vlow  = data_dico["stallSpeed"][i]
+      V1    = 0.90*min(EffectiveSpeed)
+      V2    = 1.10*max(EffectiveSpeed)
+      dico_variable = {
+         "Vlow"   : str(Vlow),
+         "V1"   : str(V1),
+         "V2"   : str(V2)
+      }
+
+      if TERMINAL == "PC": os.chdir("/cfg_files")
+      if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/cfg_files")
+      rewrite_cfg_file(f"{name}.cfg", dico_variable)
+
 
 def rewrite_cfg_file(filename,variables):
    with open(filename,"r") as current_file:
