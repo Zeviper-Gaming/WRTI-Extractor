@@ -2,6 +2,8 @@ import os
 import shutil
 import pandas as pd
 from MyPack2.Myos import TERMINAL
+from MyPack2.Utilities import truncDecimal
+DEBUG = False
 
 def update_wtrti_data():
    '''
@@ -34,14 +36,15 @@ def generate_cfg_files(data_dico):
    :return:
    '''
    filename = "0-custom.cfg"
+   os.chdir("F:\Github Local\WRTI-Extractor")
    if TERMINAL == "PC":
-      path_source = "/datas"  #Dossier de config avec les données
-      path_target = "/cfg_files"  #Dossier regroupant les fichiers de chaques avions
+      path_source = "datas"  #Dossier de config avec les données
+      path_target = "datas/cfg_files"  #Dossier regroupant les fichiers de chaques avions
    elif TERMINAL == "MAC":
       path_source = "/Users/florian/Github Local/WRTI-Extractor/datas"
-      path_target = "/Users/florian/Github Local/WRTI-Extractor/cfg_files"
+      path_target = "/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files"
    for name in data_dico["Name"]:
-      if TERMINAL == "PC":    shutil.copy(f"{path_source}\{filename}",f"{path_target}\{name}.cfg")
+      if TERMINAL == "PC":    shutil.copy(f"{path_source}/{filename}",f"{path_target}/{name}.cfg")
       if TERMINAL == "MAC":   shutil.copy(f"{path_source}/{filename}",f"{path_target}/{name}.cfg")
 
 def import_data_from_dict(data_dico):
@@ -88,27 +91,31 @@ def import_data_from_dict(data_dico):
          "rpm_2"  : rpm_2,
          "rpm_3"  : rpm_3,
       }
-      if TERMINAL == "PC": os.chdir("/cfg_files")
-      if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/cfg_files")
+      if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor\datas\cfg_files")
+      if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files")
       rewrite_cfg_file(f"{name}.cfg",dico_variable)
 
 def import_data_from_extracted_data(data_dico):
    for i, name in enumerate(data_dico["aircraft"]):
+      if DEBUG: print(f"importing {name}...")
       EffectiveSpeed = [data_dico["AileronEffectiveSpeed"][i],
                         data_dico["RudderEffectiveSpeed"][i],
                         data_dico["ElevatorsEffectiveSpeed"][i]]
-      Vlow  = data_dico["stallSpeed"][i]
-      V1    = 0.90*min(EffectiveSpeed)
-      V2    = 1.10*max(EffectiveSpeed)
+      Vlow  = truncDecimal(data_dico["stallSpeed"][i],0)
+      V1    = truncDecimal(0.90*min(EffectiveSpeed),0)
+      V2    = truncDecimal(1.10*max(EffectiveSpeed),0)
       dico_variable = {
          "Vlow"   : str(Vlow),
          "V1"   : str(V1),
          "V2"   : str(V2)
       }
 
-      if TERMINAL == "PC": os.chdir("/cfg_files")
-      if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/cfg_files")
-      rewrite_cfg_file(f"{name}.cfg", dico_variable)
+      if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor\datas\cfg_files")
+      if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files")
+      try:
+         rewrite_cfg_file(f"{name}.cfg", dico_variable)
+      except:
+         pass
 
 
 def rewrite_cfg_file(filename,variables):

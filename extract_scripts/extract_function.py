@@ -40,9 +40,9 @@ def extract_effectiveSpeed(json_data, filename):
         dict: Contient les vitesses effectives extraites avec un arrondi.
     """
     try:
-        AileronEffectiveSpeed = None
-        RudderEffectiveSpeed = None
-        ElevatorsEffectiveSpeed = None
+        AileronEffectiveSpeed = 0
+        RudderEffectiveSpeed = 0
+        ElevatorsEffectiveSpeed = 0
 
         # Extraction de AileronEffectiveSpeed
         if "AileronEffectiveSpeed" in json_data:

@@ -14,8 +14,9 @@ if TERMINAL == "PC": os.chdir("/")
 if TERMINAL == "MAC": os.chdir("/Users/florian/Github Local/WRTI-Extractor")
 
 # Charge les données de config de ce programme dans un dico
-os.chdir("../datas/")
+os.chdir("F:\Github Local\WRTI-Extractor\datas")
 dico_fm_data_db = csv.Csv2Dict("fm_data_db.csv")
+dico_extracted_data = csv.Csv2Dict("extracted_aircraft_data.csv")
 print("Data load into dico")
 
 # Génere une copie de "0-custom.cfg" pour chaque avion selon les données de "fm_data_db.csv"
@@ -24,7 +25,7 @@ print("cfg files was pasted from custom file")
 
 # Remplace les variables dans chaques cfg par les données calculés.
 func.import_data_from_dict(dico_fm_data_db)
-func.import_data_from_extracted_data(dico_fm_data_db)
+func.import_data_from_extracted_data(dico_extracted_data)
 print("Datas writed in cfg files")
 
 print("Cfg update completed !")
