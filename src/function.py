@@ -9,6 +9,10 @@ from MyPack2.Myos import TERMINAL
 from MyPack2.Utilities import truncDecimal
 DEBUG = False
 
+def goto_root():
+   if TERMINAL == "PC": pass
+   if TERMINAL == "MAC": os.chdir("/Users/florian/Github Local/WRTI-Extractor")
+
 def update_wtrti_data():
    '''
    Fait la mise à jour des données de WTRTI pour ce programme. A n'utiliser que l'orsque les caractéritiques
@@ -113,7 +117,6 @@ def import_data_from_extracted_data(data_dico):
       except:
          pass
 
-
 def rewrite_cfg_file(filename,variables):
    with open(filename,"r") as current_file:
       all_file_lines = current_file.readlines()
@@ -151,8 +154,7 @@ def get_flaps_crit_speed(data_dico,index):
       if int(Fd) == 1: Vd = "0"
 
    return Fc,Fd,Vc,Vd,Va
-##################### TEST ZONE
-#update_wtrti_data()
+
 
 def analyze_compressor_power(json_file):
    # Charger les données JSON
@@ -160,50 +162,47 @@ def analyze_compressor_power(json_file):
       data = json.load(file)
 
    # Extraire les données pour les étages de compresseur
-   compressor_data = data.get("Compressor", {})
+   compressor_data = data.get("EngineType0", {}).get("Compressor", {})
    if not compressor_data:
       print("Aucune donnée de compresseur trouvée.")
       return
 
    # Préparer les données des étages
    stages = []
-   for i in range(compressor_data.get("NumSteps", 0)):
+   num_steps = compressor_data.get("NumSteps", 1)  # Par défaut, au moins un étage
+   for i in range(num_steps):
       stage_data = {
          "altitudes": [],
          "pressures": [],
          "powers": []
       }
-      for key, value in compressor_data.items():
-         if key.startswith(f"Altitude{i}"):
-            stage_data["altitudes"].append(value)
-         elif key.startswith(f"Power{i}"):
-            stage_data["powers"].append(value)
-         elif key.startswith(f"Pressure{i}"):
-            stage_data["pressures"].append(value)
+      if f"Altitude{i}" in compressor_data and f"Power{i}" in compressor_data:
+         stage_data["altitudes"].append(compressor_data[f"Altitude{i}"])
+         stage_data["powers"].append(compressor_data[f"Power{i}"])
+      if f"ATA{i}" in compressor_data:
+         stage_data["pressures"].append(compressor_data[f"ATA{i}"])
 
-      # Vérification si toutes les données nécessaires sont présentes
-      if len(stage_data["altitudes"]) != len(stage_data["pressures"]):
-         print(f"Données incomplètes pour l'étage {i}.")
-         continue
+      # Ajouter les plafonds (Ceiling)
+      if f"Ceiling{i}" in compressor_data:
+         stage_data["altitudes"].append(compressor_data[f"Ceiling{i}"])
+         stage_data["powers"].append(compressor_data.get(f"PowerAtCeiling{i}", 0))
 
-      stages.append(stage_data)
+      if stage_data["altitudes"]:
+         stages.append(stage_data)
 
    # Calculer la puissance pour chaque étage avec interpolation
    interpolated_stages = []
    for stage in stages:
       altitudes = np.array(stage["altitudes"])
-      pressures = np.array(stage["pressures"])
-      max_power = max(stage["powers"]) if stage["powers"] else None
+      powers = np.array(stage["powers"])
 
-      if max_power is None:
-         max_power = 1000  # Valeur par défaut si inconnue
-
-      # Calcul des puissances proportionnelles aux pressions
-      powers = pressures / max(pressures) * max_power
+      if len(powers) != len(altitudes):
+         print("Données incomplètes pour un étage. Interpolation impossible.")
+         continue
 
       # Interpolation polynomiale
       smooth_altitudes = np.linspace(min(altitudes), max(altitudes), 500)
-      poly = make_interp_spline(altitudes, powers, k=3)
+      poly = make_interp_spline(altitudes, powers, k=min(3, len(altitudes) - 1))
       smooth_powers = poly(smooth_altitudes)
 
       interpolated_stages.append({
