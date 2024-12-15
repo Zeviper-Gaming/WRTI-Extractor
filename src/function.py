@@ -1,12 +1,12 @@
 import os
 import shutil
-import pandas as pd
 import json
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import make_interp_spline
 from MyPack2.Myos import TERMINAL
 from MyPack2.Utilities import truncDecimal
+
 DEBUG = False
 
 def goto_root():
@@ -155,108 +155,83 @@ def get_flaps_crit_speed(data_dico,index):
 
    return Fc,Fd,Vc,Vd,Va
 
+def extract_compressor_data(json_file_path):
+    """
+    Extrait les données des compresseurs depuis un fichier JSON.
 
-import json
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.interpolate import make_interp_spline
+    Args:
+        json_file_path (str): Chemin du fichier JSON.
 
-def analyze_compressor_power(json_file):
-    # Charger les données JSON
-    with open(json_file, 'r') as file:
+    Returns:
+        dict: Contient les données des deux étages de compresseur, avec altitudes et puissances interpolées.
+    """
+    with open(json_file_path, 'r') as file:
         data = json.load(file)
 
-    # Extraire les données pour les étages de compresseur
-    compressor_data = data.get("EngineType0", {}).get("Compressor", {})
-    if not compressor_data:
-        print("Aucune donnée de compresseur trouvée.")
-        return
+    # Extraction des données pour le premier étage
+    altitudes_stage1 = [0, data['Compressor']['Altitude0'], data['Compressor']['Altitude1'], data['Compressor']['Ceiling0']]
+    pressures_stage1 = [
+        data['Compressor']['CompressorPressureAtRPM0'],
+        data['Compressor']['ManifoldPressure'],
+        data['Compressor']['ManifoldPressure'],
+        data['Compressor']['CompressorPressureAtRPM0'] * 0.52  # Approximation pour plafond
+    ]
+    base_power_stage1 = 1310  # Hypothèse sur la puissance de base pour le premier étage
+    power_stage1 = [p / max(pressures_stage1) * base_power_stage1 for p in pressures_stage1]
 
-    # Préparer les données des étages
-    stages = []
-    num_steps = compressor_data.get("NumSteps", 1)  # Par défaut, au moins un étage
-    for i in range(num_steps):
-        stage_data = {
-            "altitudes": [],
-            "pressures": [],
-            "powers": []
-        }
-        if f"Altitude{i}" in compressor_data and f"Power{i}" in compressor_data:
-            stage_data["altitudes"].append(compressor_data[f"Altitude{i}"])
-            stage_data["powers"].append(compressor_data[f"Power{i}"])
-        if f"ATA{i}" in compressor_data:
-            stage_data["pressures"].append(compressor_data[f"ATA{i}"])
+    # Extraction des données pour le deuxième étage
+    altitudes_stage2 = [
+        data['Compressor']['Altitude1'],
+        data['Compressor']['Ceiling0'],
+        data['Compressor']['Ceiling1']
+    ]
+    pressures_stage2 = [
+        data['Compressor']['CompressorPressureAtRPM0'] * 0.35,
+        data['Compressor']['ManifoldPressure'] * 0.85,
+        data['Compressor']['ManifoldPressure'] * 0.5
+    ]
+    base_power_stage2 = 1240  # Hypothèse sur la puissance de base pour le deuxième étage
+    power_stage2 = [p / max(pressures_stage2) * base_power_stage2 for p in pressures_stage2]
 
-        # Ajouter les plafonds (Ceiling)
-        if f"Ceiling{i}" in compressor_data:
-            stage_data["altitudes"].append(compressor_data[f"Ceiling{i}"])
-            stage_data["powers"].append(compressor_data.get(f"PowerAtCeiling{i}", 0))
+    return {
+        "altitudes_stage1": altitudes_stage1,
+        "power_stage1": power_stage1,
+        "altitudes_stage2": altitudes_stage2,
+        "power_stage2": power_stage2
+    }
 
-        # Ajouter des points extrapolés pour des plages larges
-        if stage_data["altitudes"]:
-            min_altitude = min(stage_data["altitudes"])
-            if min_altitude > 0:  # Ajouter une hypothèse pour les basses altitudes
-                stage_data["altitudes"].insert(0, 0)
-                low_pressure = compressor_data.get(f"CompressorPressureAtRPM0", 0.4)  # Hypothèse basse
-                max_pressure = max(stage_data["pressures"] + [1.283])
-                stage_data["powers"].insert(0, low_pressure / max_pressure * stage_data["powers"][-1])
+def plot_compressor_graph(data):
+    """
+    Génère un graphique comparant les puissances des deux étages de compresseur.
 
-            stages.append(stage_data)
+    Args:
+        data (dict): Données des altitudes et puissances pour les deux étages.
+    """
+    # Interpolation pour des courbes lisses
+    smooth_alt_stage1 = np.linspace(min(data['altitudes_stage1']), max(data['altitudes_stage1']), 500)
+    poly_stage1 = make_interp_spline(data['altitudes_stage1'], data['power_stage1'], k=3)
+    smooth_power_stage1 = poly_stage1(smooth_alt_stage1)
 
-    # Calculer la puissance pour chaque étage avec interpolation
-    interpolated_stages = []
-    for stage in stages:
-        altitudes = np.array(stage["altitudes"])
-        powers = np.array(stage["powers"])
+    smooth_alt_stage2 = np.linspace(min(data['altitudes_stage2']), max(data['altitudes_stage2']), 500)
+    poly_stage2 = make_interp_spline(data['altitudes_stage2'], data['power_stage2'], k=3)
+    smooth_power_stage2 = poly_stage2(smooth_alt_stage2)
 
-        if len(powers) != len(altitudes):
-            print("Données incomplètes pour un étage. Interpolation impossible.")
-            continue
-
-        # Interpolation polynomiale
-        smooth_altitudes = np.linspace(min(altitudes), max(altitudes), 500)
-        poly = make_interp_spline(altitudes, powers, k=min(3, len(altitudes) - 1))
-        smooth_powers = poly(smooth_altitudes)
-
-        interpolated_stages.append({
-            "altitudes": smooth_altitudes,
-            "powers": smooth_powers
-        })
-
-    # Trouver les altitudes de changement d'étage
-    change_altitudes = []
-    for i in range(len(interpolated_stages) - 1):
-        alt1, power1 = interpolated_stages[i]["altitudes"], interpolated_stages[i]["powers"]
-        alt2, power2 = interpolated_stages[i + 1]["altitudes"], interpolated_stages[i + 1]["powers"]
-
-        # Intersection des courbes
-        common_altitudes = np.linspace(max(min(alt1), min(alt2)), min(max(alt1), max(alt2)), 500)
-        powers1 = np.interp(common_altitudes, alt1, power1)
-        powers2 = np.interp(common_altitudes, alt2, power2)
-        diff = powers2 - powers1
-
-        if np.any(diff > 0):
-            idx = np.argmax(diff > 0)
-            change_altitudes.append(common_altitudes[idx])
-
-    # Afficher les courbes
+    # Visualisation
     plt.figure(figsize=(10, 6))
-    colors = ["blue", "orange", "green", "red"]
-    for i, stage in enumerate(interpolated_stages):
-        plt.plot(stage["altitudes"], stage["powers"], label=f"Compresseur {i+1}", color=colors[i % len(colors)])
-
-    for alt in change_altitudes:
-        plt.axvline(x=alt, color="black", linestyle="--", label=f"Changement d'étage à {alt:.0f} m")
-
+    plt.plot(smooth_alt_stage1, smooth_power_stage1, label="Compresseur 1 (puissance)", color="blue")
+    plt.plot(smooth_alt_stage2, smooth_power_stage2, label="Compresseur 2 (puissance)", color="orange")
+    plt.scatter(data['altitudes_stage1'], data['power_stage1'], color="blue", label="Données observées - Compresseur 1")
+    plt.scatter(data['altitudes_stage2'], data['power_stage2'], color="red", label="Données observées - Compresseur 2")
     plt.xlabel("Altitude (m)")
     plt.ylabel("Puissance (ch)")
-    plt.title("Puissance des étages de compresseur en fonction de l'altitude")
+    plt.title("Puissances générées par les deux étages de compresseur")
     plt.legend()
     plt.grid(True)
     plt.show()
 
-    # Retourner les altitudes de changement
-    return change_altitudes
+if __name__ == "__main__":
+    # Exemple d'utilisation
+    json_file_path = "path_to_your_json_file.json"  # Remplacer par le chemin de votre fichier JSON
+    compressor_data = extract_compressor_data(json_file_path)
+    plot_compressor_graph(compressor_data)
 
-# Exemple d'utilisation
-# change_points = analyze_compressor_power("chemin_du_fichier.json")
