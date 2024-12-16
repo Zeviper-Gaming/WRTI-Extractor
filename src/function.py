@@ -102,11 +102,13 @@ def import_data_from_extracted_data(data_dico):
       Vlow  = Vred + 50  # Warning décrochage
       V1    = truncDecimal(min(EffectiveSpeed),0) # Seuil vitesse efficace bas
       V2    = truncDecimal(max(EffectiveSpeed),0) # Seuil vitesse efficace haut
+      MachCrit = 0.65 # Mach Critique
       dico_variable = {
          "Vred"   : str(Vred),
          "Vlow"   : str(Vlow),
          "V1"     : str(V1),
          "V2"     : str(V2),
+         "MachCrit"     : str(MachCrit),
 
       }
 
