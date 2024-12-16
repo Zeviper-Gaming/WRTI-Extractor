@@ -12,16 +12,13 @@ def extract_stallSpeed(json_data,filename):
         float: La valeur de la vitesse de décrochage.
     """
     try:
-        stall_speed = None
+        stall_speed = 180
         # Vérifie la présence des clés avant d'y accéder
         if "stallSpeed" in json_data["Passport"]["Alt"]:
             stall_speed = json_data["Passport"]["Alt"]["stallSpeed"][1]
 
         elif "MinimalSpeed" in json_data:
             stall_speed = json_data["MinimalSpeed"]
-
-        if stall_speed is None:
-            raise ValueError(f"stallSpeed ou MinimalSpeed non trouvé pour {filename}")
 
         return truncDecimal(stall_speed, 0)
     except Exception as e:
