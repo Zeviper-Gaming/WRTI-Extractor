@@ -164,33 +164,47 @@ def extract_compressor_data(json_file_path):
 
     Returns:
         dict: Contient les données des deux étages de compresseur, avec altitudes et puissances interpolées.
+
+    Raises:
+        FileNotFoundError: Si le fichier JSON n'existe pas.
     """
+    if not os.path.exists(json_file_path):
+        raise FileNotFoundError(f"Le fichier JSON spécifié est introuvable : {json_file_path}")
+
     with open(json_file_path, 'r') as file:
         data = json.load(file)
 
+    # Accéder aux données du compresseur dans EngineType0 > Compressor
+    compressor_data = data['EngineType0']['Compressor']
+
     # Extraction des données pour le premier étage
-    altitudes_stage1 = [0, data['Compressor']['Altitude0'], data['Compressor']['Altitude1'], data['Compressor']['Ceiling0']]
-    pressures_stage1 = [
-        data['Compressor']['CompressorPressureAtRPM0'],
-        data['Compressor']['ManifoldPressure'],
-        data['Compressor']['ManifoldPressure'],
-        data['Compressor']['CompressorPressureAtRPM0'] * 0.52  # Approximation pour plafond
+    altitudes_stage1 = [
+        0,
+        compressor_data['Altitude0'],
+        compressor_data['Altitude1'],
+        compressor_data['Ceiling0']
     ]
-    base_power_stage1 = 1310  # Hypothèse sur la puissance de base pour le premier étage
+    pressures_stage1 = [
+        compressor_data['ATA0'],  # Pression à bas régime
+        compressor_data['ATA1'],  # Pression optimale
+        compressor_data['ATA1'],
+        compressor_data['ATA0'] * 0.52  # Approximation pour plafond
+    ]
+    base_power_stage1 = compressor_data['Power0']  # Puissance maximale du premier étage
     power_stage1 = [p / max(pressures_stage1) * base_power_stage1 for p in pressures_stage1]
 
     # Extraction des données pour le deuxième étage
     altitudes_stage2 = [
-        data['Compressor']['Altitude1'],
-        data['Compressor']['Ceiling0'],
-        data['Compressor']['Ceiling1']
+        compressor_data['Altitude1'],
+        compressor_data['Ceiling0'],
+        compressor_data['Ceiling1']
     ]
     pressures_stage2 = [
-        data['Compressor']['CompressorPressureAtRPM0'] * 0.35,
-        data['Compressor']['ManifoldPressure'] * 0.85,
-        data['Compressor']['ManifoldPressure'] * 0.5
+        compressor_data['ATA0'] * 0.35,  # Pression initiale estimée
+        compressor_data['ATA1'] * 0.85,  # Pression intermédiaire estimée
+        compressor_data['ATA1'] * 0.5  # Pression au plafond
     ]
-    base_power_stage2 = 1240  # Hypothèse sur la puissance de base pour le deuxième étage
+    base_power_stage2 = compressor_data['Power1']  # Puissance maximale du deuxième étage
     power_stage2 = [p / max(pressures_stage2) * base_power_stage2 for p in pressures_stage2]
 
     return {
@@ -200,6 +214,22 @@ def extract_compressor_data(json_file_path):
         "power_stage2": power_stage2
     }
 
+def create_spline(x, y):
+    """
+    Crée une interpolation spline en fonction du nombre de points disponibles.
+
+    Args:
+        x (list): Liste des abscisses.
+        y (list): Liste des ordonnées.
+
+    Returns:
+        callable: Fonction spline interpolée.
+    """
+    if len(x) < 2:
+        raise ValueError("Pas assez de points pour effectuer une interpolation.")
+    k = min(3, len(x) - 1)  # Adapter le degré du spline
+    return make_interp_spline(x, y, k=k)
+
 def plot_compressor_graph(data):
     """
     Génère un graphique comparant les puissances des deux étages de compresseur.
@@ -208,13 +238,21 @@ def plot_compressor_graph(data):
         data (dict): Données des altitudes et puissances pour les deux étages.
     """
     # Interpolation pour des courbes lisses
-    smooth_alt_stage1 = np.linspace(min(data['altitudes_stage1']), max(data['altitudes_stage1']), 500)
-    poly_stage1 = make_interp_spline(data['altitudes_stage1'], data['power_stage1'], k=3)
-    smooth_power_stage1 = poly_stage1(smooth_alt_stage1)
+    try:
+        smooth_alt_stage1 = np.linspace(min(data['altitudes_stage1']), max(data['altitudes_stage1']), 500)
+        poly_stage1 = create_spline(data['altitudes_stage1'], data['power_stage1'])
+        smooth_power_stage1 = poly_stage1(smooth_alt_stage1)
+    except ValueError as e:
+        print(f"Erreur d'interpolation pour le premier étage : {e}")
+        smooth_alt_stage1, smooth_power_stage1 = data['altitudes_stage1'], data['power_stage1']
 
-    smooth_alt_stage2 = np.linspace(min(data['altitudes_stage2']), max(data['altitudes_stage2']), 500)
-    poly_stage2 = make_interp_spline(data['altitudes_stage2'], data['power_stage2'], k=3)
-    smooth_power_stage2 = poly_stage2(smooth_alt_stage2)
+    try:
+        smooth_alt_stage2 = np.linspace(min(data['altitudes_stage2']), max(data['altitudes_stage2']), 500)
+        poly_stage2 = create_spline(data['altitudes_stage2'], data['power_stage2'])
+        smooth_power_stage2 = poly_stage2(smooth_alt_stage2)
+    except ValueError as e:
+        print(f"Erreur d'interpolation pour le deuxième étage : {e}")
+        smooth_alt_stage2, smooth_power_stage2 = data['altitudes_stage2'], data['power_stage2']
 
     # Visualisation
     plt.figure(figsize=(10, 6))
