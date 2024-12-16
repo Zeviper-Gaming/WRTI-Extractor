@@ -16,6 +16,8 @@ extracted_data_dict = {
     "AileronEffectiveSpeed": [],
     "RudderEffectiveSpeed": [],
     "ElevatorsEffectiveSpeed": [],
+    "MachCritic1": [],
+    "MachCritic2": [],
     "CompressorAlt0": [],
     "CompressorAlt1": [],
     "CompressorAlt2": [],
@@ -50,6 +52,10 @@ for filename in json_files:
     extracted_data_dict["CompressorAlt0"].append(extract_compressorStage(json_data,filename)[0])
     extracted_data_dict["CompressorAlt1"].append(extract_compressorStage(json_data,filename)[1])
     extracted_data_dict["CompressorAlt2"].append(extract_compressorStage(json_data,filename)[2])
+
+    # Extract Mach Critique
+    extracted_data_dict["MachCritic1"].append(min(extract_MachCrit(json_data,filename)))
+    extracted_data_dict["MachCritic2"].append(max(extract_MachCrit(json_data,filename)))
 
 
 # Sauvegarder les données du dictionnaire dans un fichier CSV

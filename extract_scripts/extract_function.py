@@ -105,4 +105,16 @@ def extract_compressorStage(json_data, filename):
     return output
 
 def extract_MachCrit(json_data, filename):
-    print("")
+    MachCrit1 = 0
+    MachCrit2 = 0
+    try:
+        [MachCrit1,MachCrit2] = [json_data["Aerodynamics"]["WingPlane"]["FlapsPolar0"]["MachCrit1"],
+                                 json_data["Aerodynamics"]["FuselagePlane"]["Polar"]["MachCrit1"]]
+    except:
+        pass
+    try:
+        [MachCrit1,MachCrit2] = [json_data["Aerodynamics"]["MachCrit1"],
+                                 json_data["Aerodynamics"]["Fuselage"]["MachCrit1"]]
+    except:
+        pass
+    return [MachCrit1,MachCrit2]
