@@ -102,14 +102,28 @@ def import_data_from_extracted_data(data_dico):
       Vlow  = Vred + 50  # Warning décrochage
       V1    = truncDecimal(min(EffectiveSpeed),0) # Seuil vitesse efficace bas
       V2    = truncDecimal(max(EffectiveSpeed),0) # Seuil vitesse efficace haut
-      MachCrit = 0.65 # Mach Critique
+      MachCrit1 = data_dico["MachCritic1"] # Mach Critique
+      MachCrit2 = data_dico["MachCritic2"] # Mach Critique
+      # Altitude
+      Alt11 = 0.8*data_dico["CompressorAlt0"] - 500
+      Alt12 = 1.2*data_dico["CompressorAlt0"] + 500
+      Alt21 = 0.8*data_dico["CompressorAlt1"] - 500
+      Alt22 = 1.2*data_dico["CompressorAlt1"] + 500
+      Alt31 = 0.8*data_dico["CompressorAlt2"] - 500
+      Alt32 = 1.2*data_dico["CompressorAlt2"] + 500
       dico_variable = {
-         "Vred"   : str(Vred),
-         "Vlow"   : str(Vlow),
-         "V1"     : str(V1),
-         "V2"     : str(V2),
-         "MachCrit"     : str(MachCrit),
-
+        "Vred"   : str(Vred),
+        "Vlow"   : str(Vlow),
+        "V1"     : str(V1),
+        "V2"     : str(V2),
+        "MachCrit1"     : str(MachCrit1),
+        "MachCrit2"     : str(MachCrit2),
+        "Alt11" : str(Alt11),
+        "Alt12" : str(Alt12),
+        "Alt21" : str(Alt21),
+        "Alt22" : str(Alt22),
+        "Alt31" : str(Alt31),
+        "Alt32" : str(Alt32),
       }
 
       if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor\datas\cfg_files")
