@@ -99,7 +99,10 @@ def import_data_from_extracted_data(data_dico):
                         data_dico["RudderEffectiveSpeed"][i],
                         data_dico["ElevatorsEffectiveSpeed"][i]]
       Vred  = truncDecimal(data_dico["stallSpeed"][i],0) # Vitesse de décrochage
-      Vlow  = Vred + 50  # Warning décrochage
+      if Vred != "None":
+          Vlow  = Vred + 50
+      else:
+          Vlow = "None" # Warning décrochage
       V1    = truncDecimal(min(EffectiveSpeed),0) # Seuil vitesse efficace bas
       V2    = truncDecimal(max(EffectiveSpeed),0) # Seuil vitesse efficace haut
       MachCrit1 = data_dico["MachCritic1"][i] # Mach Critique
@@ -118,7 +121,7 @@ def import_data_from_extracted_data(data_dico):
           Altmax = Alt32
       else:
           Alt31, Alt32 = 0 , 0
-          Altmax = 20000
+          Altmax = max(Alt12,Alt22,Alt32)
       dico_variable = {
         "Vred"   : str(Vred),
         "Vlow"   : str(Vlow),
