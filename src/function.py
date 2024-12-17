@@ -102,15 +102,23 @@ def import_data_from_extracted_data(data_dico):
       Vlow  = Vred + 50  # Warning décrochage
       V1    = truncDecimal(min(EffectiveSpeed),0) # Seuil vitesse efficace bas
       V2    = truncDecimal(max(EffectiveSpeed),0) # Seuil vitesse efficace haut
-      MachCrit1 = data_dico["MachCritic1"] # Mach Critique
-      MachCrit2 = data_dico["MachCritic2"] # Mach Critique
+      MachCrit1 = data_dico["MachCritic1"][i] # Mach Critique
+      MachCrit2 = data_dico["MachCritic2"][i] # Mach Critique
       # Altitude
-      Alt11 = 0.8*data_dico["CompressorAlt0"] - 500
-      Alt12 = 1.2*data_dico["CompressorAlt0"] + 500
-      Alt21 = 0.8*data_dico["CompressorAlt1"] - 500
-      Alt22 = 1.2*data_dico["CompressorAlt1"] + 500
-      Alt31 = 0.8*data_dico["CompressorAlt2"] - 500
-      Alt32 = 1.2*data_dico["CompressorAlt2"] + 500
+      Alt11 = 0.8*data_dico["CompressorAlt0"][i] - 500
+      Alt12 = 1.2*data_dico["CompressorAlt0"][i] + 500
+      if data_dico["CompressorAlt1"][i] != 0:
+          Alt21 = 0.8*data_dico["CompressorAlt1"][i] - 500
+          Alt22 = 1.2*data_dico["CompressorAlt1"][i] + 500
+      else:
+          Alt21, Alt22 = 0 ,0
+      if data_dico["CompressorAlt2"][i] !=0:
+          Alt31 = 0.8*data_dico["CompressorAlt2"][i] - 500
+          Alt32 = 1.2*data_dico["CompressorAlt2"][i] + 500
+          Altmax = Alt32
+      else:
+          Alt31, Alt32 = 0 , 0
+          Altmax = 20000
       dico_variable = {
         "Vred"   : str(Vred),
         "Vlow"   : str(Vlow),
@@ -124,6 +132,7 @@ def import_data_from_extracted_data(data_dico):
         "Alt22" : str(Alt22),
         "Alt31" : str(Alt31),
         "Alt32" : str(Alt32),
+        "Altmax" : str(Altmax),
       }
 
       if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor\datas\cfg_files")
