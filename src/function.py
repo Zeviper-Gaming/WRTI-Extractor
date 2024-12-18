@@ -123,7 +123,7 @@ def import_data_from_extracted_data(data_dico):
           Alt31, Alt32 = 0 , 0
           Altmax = max(Alt12,Alt22,Alt32)
       # Engine power
-      Power100 = data_dico["EnginePower"]
+      Power100 = data_dico["EnginePower"][i]
       Power105 = 1.05*Power100
       Power110 = 1.10*Power100
       Power095 = 0.95*Power100
@@ -131,9 +131,9 @@ def import_data_from_extracted_data(data_dico):
       Power070 = 0.70*Power100
       Power050 = 0.50*Power100
       # Cooling Air speed
-      CoolingSpeed = data_dico["CoolingEffectiveAirSpeed"]
-      OilT = data_dico["OilBoilingTemperature"]
-      WaterT = data_dico["WaterBoilingTemperature"]
+      CoolingSpeed = data_dico["CoolingEffectiveAirSpeed"][i]
+      OilT = data_dico["OilBoilingTemperature"][i]
+      WaterT = data_dico["WaterBoilingTemperature"][i]
 
       dico_variable = {
         "Vred"   : str(Vred),
