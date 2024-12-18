@@ -21,6 +21,10 @@ extracted_data_dict = {
     "CompressorAlt0": [],
     "CompressorAlt1": [],
     "CompressorAlt2": [],
+    "EnginePower": [],
+    "CoolingEffectiveAirSpeed": [],
+    "WaterBoilingTemperature": [],
+    "OilBoilingTemperature": [],
 }
 
 # Ouvre la liste des fichiers .json
@@ -57,6 +61,13 @@ for filename in json_files:
     extracted_data_dict["MachCritic1"].append(min(extract_MachCrit(json_data,filename)))
     extracted_data_dict["MachCritic2"].append(max(extract_MachCrit(json_data,filename)))
 
+    # Extract Engine Power
+    extracted_data_dict["EnginePower"].append(extract_EnginePower(json_data,filename))
+
+    # Extract Cooling Efficiency
+    extracted_data_dict["CoolingEffectiveAirSpeed"].append(extract_RadiatorSpeed(json_data,filename)[0])
+    extracted_data_dict["WaterBoilingTemperature"].append(extract_RadiatorSpeed(json_data,filename)[1])
+    extracted_data_dict["OilBoilingTemperature"].append(extract_RadiatorSpeed(json_data,filename)[2])
 
 # Sauvegarder les données du dictionnaire dans un fichier CSV
 Dict2CSV(extracted_data_dict, destination_csv_path)

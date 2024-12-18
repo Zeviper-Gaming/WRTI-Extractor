@@ -118,3 +118,36 @@ def extract_MachCrit(json_data, filename):
     except:
         pass
     return [MachCrit1,MachCrit2]
+
+def extract_EnginePower(json_data, filename):
+    EnginePower = 0
+    try:
+        EnginePower = json_data["EngineType0"]["Main"]["Power"]
+    except:
+        pass
+    try:
+        EnginePower = json_data["Engine0"]["Main"]["Power"]
+    except:
+        pass
+
+    return EnginePower
+
+def extract_RadiatorSpeed(json_data, filename):
+    RadiatorSpeed = 0
+    WaterBoilingTemperature = 0
+    OilBoilingTemperature = 0
+
+    try:
+        RadiatorSpeed = json_data["EngineType0"]["Temperature"]["CoolingEffectiveAirSpeed"]
+        WaterBoilingTemperature = json_data["EngineType0"]["Temperature"]["WaterBoilingTemperature"]
+        OilBoilingTemperature = json_data["EngineType0"]["Temperature"]["OilBoilingTemperature"]
+    except:
+        pass
+    try:
+        RadiatorSpeed = json_data["Engine0"]["Temperature"]["CoolingEffectiveAirSpeed"]
+        WaterBoilingTemperature = json_data["Engine0"]["Temperature"]["WaterBoilingTemperature"]
+        OilBoilingTemperature = json_data["Engine0"]["Temperature"]["OilBoilingTemperature"]
+    except:
+        pass
+
+    return [RadiatorSpeed,WaterBoilingTemperature,OilBoilingTemperature]
