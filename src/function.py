@@ -122,6 +122,19 @@ def import_data_from_extracted_data(data_dico):
       else:
           Alt31, Alt32 = 0 , 0
           Altmax = max(Alt12,Alt22,Alt32)
+      # Engine power
+      Power100 = data_dico["EnginePower"]
+      Power105 = 1.05*Power100
+      Power110 = 1.10*Power100
+      Power095 = 0.95*Power100
+      Power085 = 0.85*Power100
+      Power070 = 0.70*Power100
+      Power050 = 0.50*Power100
+      # Cooling Air speed
+      CoolingSpeed = data_dico["CoolingEffectiveAirSpeed"]
+      OilT = data_dico["OilBoilingTemperature"]
+      WaterT = data_dico["WaterBoilingTemperature"]
+
       dico_variable = {
         "Vred"   : str(Vred),
         "Vlow"   : str(Vlow),
@@ -136,6 +149,16 @@ def import_data_from_extracted_data(data_dico):
         "Alt31" : str(Alt31),
         "Alt32" : str(Alt32),
         "Altmax" : str(Altmax),
+        "Power100" : str(Power100),
+        "Power105" : str(Power105),
+        "Power110" : str(Power110),
+        "Power095" : str(Power095),
+        "Power085" : str(Power085),
+        "Power070" : str(Power070),
+        "Power050" : str(Power050),
+        "CoolingSpeed" : str(CoolingSpeed),
+        "OilT" : str(OilT),
+        "WaterT" : str(WaterT),
       }
 
       if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor\datas\cfg_files")
