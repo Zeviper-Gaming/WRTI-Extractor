@@ -45,12 +45,25 @@ for filename in json_files:
     stallSpeed = extract_stallSpeed(json_data,filename)
     extracted_data_dict["stallSpeed"].append(stallSpeed)
 
-
     # Extract effective speed
     data = extract_effectiveSpeed(json_data,filename)
     extracted_data_dict["AileronEffectiveSpeed"].append(data["AileronEffectiveSpeed"])
     extracted_data_dict["RudderEffectiveSpeed"].append(data["RudderEffectiveSpeed"])
     extracted_data_dict["ElevatorsEffectiveSpeed"].append(data["ElevatorsEffectiveSpeed"])
+
+    # Extract Gear and Airbrakes Critical Speed
+    extracted_data_dict["GearDestructionIndSpeed"].append(json_data["Mass"]["GearDestructionIndSpeed"])
+    extracted_data_dict["AirbrakeDestructionIndSpeed"].append(json_data["Mass"]["AirbrakeDestructionIndSpeed"])
+
+    # Extract Flaps Critical Speed
+    try:
+        extracted_data_dict["FlapsDestructionIndSpeedP0"].append(json_data["Mass"]["FlapsDestructionIndSpeedP0"])
+        extracted_data_dict["FlapsDestructionIndSpeedP1"].append(json_data["Mass"]["FlapsDestructionIndSpeedP1"])
+        extracted_data_dict["FlapsDestructionIndSpeedP2"].append(json_data["Mass"]["FlapsDestructionIndSpeedP2"])
+    except:
+        extracted_data_dict["FlapsDestructionIndSpeedP0"].append(json_data["Mass"]["FlapsDestructionIndSpeed0"])
+        extracted_data_dict["FlapsDestructionIndSpeedP1"].append(None)
+        extracted_data_dict["FlapsDestructionIndSpeedP2"].append(None)
 
     # Extract compressor Altitudes
     extracted_data_dict["CompressorAlt0"].append(extract_compressorStage(json_data,filename)[0])
