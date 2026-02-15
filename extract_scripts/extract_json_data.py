@@ -4,6 +4,9 @@ import os
 from extract_function import *  # Import de la fonction depuis un autre script
 from MyPack2.Saves.CSV import Dict2CSV  # Import de la fonction Dict2CSV
 
+# DEBUG
+DEBUG = True
+
 # Chemins
 wtrti_data_path = "../datas/fm_data_db.csv"
 json_folder_path = "../datas/json_files"
@@ -16,6 +19,11 @@ extracted_data_dict = {
     "AileronEffectiveSpeed": [],
     "RudderEffectiveSpeed": [],
     "ElevatorsEffectiveSpeed": [],
+    "GearDestructionIndSpeed": [],
+    "AirbrakeDestructionIndSpeed": [],
+    "FlapsDestructionIndSpeedP0": [],
+    "FlapsDestructionIndSpeedP1": [],
+    "FlapsDestructionIndSpeedP2": [],
     "MachCritic1": [],
     "MachCritic2": [],
     "CompressorAlt0": [],
@@ -33,6 +41,7 @@ print(f"{len(json_files)} fichiers .json trouvés.")
 
 # Extraire les données
 for filename in json_files:
+    if DEBUG: print(filename)
     # Open file
     with open(f"{json_folder_path}/{filename}", 'r') as file:
         json_data = json.load(file)
@@ -43,7 +52,10 @@ for filename in json_files:
 
     # Extract stall speed
     stallSpeed = extract_stallSpeed(json_data,filename)
-    extracted_data_dict["stallSpeed"].append(stallSpeed)
+    try:
+        extracted_data_dict["stallSpeed"].append(stallSpeed)
+    except:
+        extracted_data_dict["stallSpeed"].append(None)
 
     # Extract effective speed
     data = extract_effectiveSpeed(json_data,filename)
@@ -52,18 +64,18 @@ for filename in json_files:
     extracted_data_dict["ElevatorsEffectiveSpeed"].append(data["ElevatorsEffectiveSpeed"])
 
     # Extract Gear and Airbrakes Critical Speed
-    extracted_data_dict["GearDestructionIndSpeed"].append(json_data["Mass"]["GearDestructionIndSpeed"])
-    extracted_data_dict["AirbrakeDestructionIndSpeed"].append(json_data["Mass"]["AirbrakeDestructionIndSpeed"])
+    data = json_data["Mass"]
+    extracted_data_dict["GearDestructionIndSpeed"].append(data.get("GearDestructionIndSpeed"))
+    extracted_data_dict["AirbrakeDestructionIndSpeed"].append(data.get("AirbrakeDestructionIndSpeed"))
 
     # Extract Flaps Critical Speed
+    data = json_data["Mass"]
     try:
-        extracted_data_dict["FlapsDestructionIndSpeedP0"].append(json_data["Mass"]["FlapsDestructionIndSpeedP0"])
-        extracted_data_dict["FlapsDestructionIndSpeedP1"].append(json_data["Mass"]["FlapsDestructionIndSpeedP1"])
-        extracted_data_dict["FlapsDestructionIndSpeedP2"].append(json_data["Mass"]["FlapsDestructionIndSpeedP2"])
+        extracted_data_dict["FlapsDestructionIndSpeedP0"].append(data.get("FlapsDestructionIndSpeedP0"))
     except:
-        extracted_data_dict["FlapsDestructionIndSpeedP0"].append(json_data["Mass"]["FlapsDestructionIndSpeed0"])
-        extracted_data_dict["FlapsDestructionIndSpeedP1"].append(None)
-        extracted_data_dict["FlapsDestructionIndSpeedP2"].append(None)
+        extracted_data_dict["FlapsDestructionIndSpeedP0"].append(json_data["Mass"]["FlapsDestructionIndSpeedP"])
+    extracted_data_dict["FlapsDestructionIndSpeedP1"].append(data.get("FlapsDestructionIndSpeedP1"))
+    extracted_data_dict["FlapsDestructionIndSpeedP2"].append(data.get("FlapsDestructionIndSpeedP2"))
 
     # Extract compressor Altitudes
     extracted_data_dict["CompressorAlt0"].append(extract_compressorStage(json_data,filename)[0])
