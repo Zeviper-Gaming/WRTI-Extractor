@@ -68,16 +68,10 @@ for filename in json_files:
 
     # Extract Flaps Critical Speed
     data = json_data.get("Mass")
-    #todo
-    # Faire en sorte que si "data.get("FlapsDestructionIndSpeedP0")" renvoie pas None alors on récupere la valeur
-    # de l'indice [1]
-    # data.get("FlapsDestructionIndSpeedP#") peut etre None ou une Liste
-    try:
-        extracted_data_dict["FlapsDestructionIndSpeedP0"].append(data.get("FlapsDestructionIndSpeedP0"))
-        extracted_data_dict["FlapsDestructionIndSpeedP1"].append(data.get("FlapsDestructionIndSpeedP1"))
-        extracted_data_dict["FlapsDestructionIndSpeedP2"].append(data.get("FlapsDestructionIndSpeedP2"))
-    except:
-        extracted_data_dict["FlapsDestructionIndSpeedP0"].append(data.get["FlapsDestructionIndSpeedP"])
+    data_FlapsDestrcutionSpeed = extract_FlapsDestructionIndSpeed(json_data)
+    extracted_data_dict["FlapsDestructionIndSpeedP0"].append(data_FlapsDestrcutionSpeed[0])
+    extracted_data_dict["FlapsDestructionIndSpeedP1"].append(data_FlapsDestrcutionSpeed[1])
+    extracted_data_dict["FlapsDestructionIndSpeedP2"].append(data_FlapsDestrcutionSpeed[2])
 
     # Extract compressor Altitudes
     extracted_data_dict["CompressorAlt0"].append(extract_compressorStage(json_data,filename)[0])

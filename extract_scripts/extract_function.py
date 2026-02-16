@@ -151,3 +151,14 @@ def extract_RadiatorSpeed(json_data, filename):
         pass
 
     return [RadiatorSpeed,WaterBoilingTemperature,OilBoilingTemperature]
+
+def extract_FlapsDestructionIndSpeed(json_data):
+    mass = json_data.get("Mass")
+    FlapsDestructionIndSpeedP0 = mass.get("FlapsDestructionIndSpeedP0")
+    if FlapsDestructionIndSpeedP0 is not None: FlapsDestructionIndSpeedP0 = FlapsDestructionIndSpeedP0[1]
+    else:  FlapsDestructionIndSpeedP0 = mass.get("FlapsDestructionIndSpeedP")[-1]
+    FlapsDestructionIndSpeedP1 = mass.get("FlapsDestructionIndSpeedP1")
+    FlapsDestructionIndSpeedP1 = FlapsDestructionIndSpeedP1[1] if FlapsDestructionIndSpeedP1 is not None else None
+    FlapsDestructionIndSpeedP2 = mass.get("FlapsDestructionIndSpeedP2")
+    FlapsDestructionIndSpeedP2 = FlapsDestructionIndSpeedP2[1] if FlapsDestructionIndSpeedP2 is not None else None
+    return [FlapsDestructionIndSpeedP0,FlapsDestructionIndSpeedP1,FlapsDestructionIndSpeedP2]
