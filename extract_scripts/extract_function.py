@@ -161,15 +161,17 @@ def extract_FlapsDestructionIndSpeed(json_data):
     P2 = mass.get("FlapsDestructionIndSpeedP2")
     P3 = mass.get("FlapsDestructionIndSpeedP3")
     P4 = mass.get("FlapsDestructionIndSpeedP4")
+    temp_list = []
 
-    P = P[-1] if P is not None else None
-    P0 = P0[1] if P0 is not None else None
-    P1 = P1[1] if P1 is not None else None
-    P2 = P2[1] if P2 is not None else None
-    P3 = P3[1] if P3 is not None else None
-    P4 = P4[1] if P4 is not None else None
+    for p in [P,P0,P1,P2,P3,P4]:
+        if p is None:
+            temp_list.append(None)
+        elif type(p[0]) == float: temp_list.append(p[1])
+        elif type(p[0]) == list:
+            for el in p: temp_list.append(el[1])
+        else:
+            TypeError("[ZV] Type de valeurs non reconnue")
 
-    temp_list = [P,P0,P1,P2,P3,P4]
     temp_list = sorted(temp_list,key = lambda x:(x is None,x))
 
     FlapsDestructionIndSpeedP2 = temp_list[0]
