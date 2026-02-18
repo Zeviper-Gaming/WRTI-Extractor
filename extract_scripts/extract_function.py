@@ -154,11 +154,26 @@ def extract_RadiatorSpeed(json_data, filename):
 
 def extract_FlapsDestructionIndSpeed(json_data):
     mass = json_data.get("Mass")
-    FlapsDestructionIndSpeedP0 = mass.get("FlapsDestructionIndSpeedP0")
-    if FlapsDestructionIndSpeedP0 is not None: FlapsDestructionIndSpeedP0 = FlapsDestructionIndSpeedP0[1]
-    else:  FlapsDestructionIndSpeedP0 = mass.get("FlapsDestructionIndSpeedP")[-1]
-    FlapsDestructionIndSpeedP1 = mass.get("FlapsDestructionIndSpeedP1")
-    FlapsDestructionIndSpeedP1 = FlapsDestructionIndSpeedP1[1] if FlapsDestructionIndSpeedP1 is not None else None
-    FlapsDestructionIndSpeedP2 = mass.get("FlapsDestructionIndSpeedP2")
-    FlapsDestructionIndSpeedP2 = FlapsDestructionIndSpeedP2[1] if FlapsDestructionIndSpeedP2 is not None else None
+    # Recuperation des valeurs si elles existent
+    P = mass.get("FlapsDestructionIndSpeedP")
+    P0 = mass.get("FlapsDestructionIndSpeedP0")
+    P1 = mass.get("FlapsDestructionIndSpeedP1")
+    P2 = mass.get("FlapsDestructionIndSpeedP2")
+    P3 = mass.get("FlapsDestructionIndSpeedP3")
+    P4 = mass.get("FlapsDestructionIndSpeedP4")
+
+    P = P[-1] if P is not None else None
+    P0 = P0[1] if P0 is not None else None
+    P1 = P1[1] if P1 is not None else None
+    P2 = P2[1] if P2 is not None else None
+    P3 = P3[1] if P3 is not None else None
+    P4 = P4[1] if P4 is not None else None
+
+    temp_list = [P,P0,P1,P2,P3,P4]
+    temp_list = sorted(temp_list,key = lambda x:(x is None,x))
+
+    FlapsDestructionIndSpeedP2 = temp_list[0]
+    FlapsDestructionIndSpeedP1 = temp_list[1]
+    FlapsDestructionIndSpeedP0 = temp_list[2]
+
     return [FlapsDestructionIndSpeedP0,FlapsDestructionIndSpeedP1,FlapsDestructionIndSpeedP2]
