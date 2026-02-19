@@ -84,9 +84,10 @@ for filename in json_files:
     extracted_data_dict["CompressorAlt2"].append(extract_compressorStage(json_data,filename)[2])
 
     # Extract RPM limits
-    extracted_data_dict["RPMMin"].append(extract_RPMLimits(json_data)[0])
-    extracted_data_dict["RPMMax"].append(extract_RPMLimits(json_data)[1])
-    extracted_data_dict["RPMMaxAllowed"].append(extract_RPMLimits(json_data)[2])
+    RPM_data = extract_RPMLimits(json_data)
+    extracted_data_dict["RPMMin"].append(RPM_data[0])
+    extracted_data_dict["RPMMax"].append(RPM_data[1])
+    extracted_data_dict["RPMMaxAllowed"].append(RPM_data[2])
     #fixme - La fonction bug a partir du "a2d.json"
 
     # Extract Mach Critique

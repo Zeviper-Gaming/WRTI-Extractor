@@ -181,9 +181,14 @@ def extract_FlapsDestructionIndSpeed(json_data):
     return [FlapsDestructionIndSpeedP0,FlapsDestructionIndSpeedP1,FlapsDestructionIndSpeedP2]
 
 def extract_RPMLimits(json_data):
-    Engine = json_data.get("EngineType0")
-    rpm_1 = Engine["Main"]["RPMMin"]
-    rpm_2 = Engine["Main"]["RPMMax"]
-    rpm_3 = Engine["Main"]["RPMMaxAllowed"]
+    Engine = [json_data.get("EngineType0"),json_data.get("Engine0"),json_data.get("EngineType1"),json_data.get("EngineType2"),json_data.get("EngineType3")]
+    for el in Engine:
+        try:
+            rpm_1 = el["Main"]["RPMMin"]
+            rpm_2 = el["Main"]["RPMMax"]
+            rpm_3 = el["Main"]["RPMMaxAllowed"]
+            break
+        except:
+            continue
 
     return [rpm_1,rpm_2,rpm_3]
