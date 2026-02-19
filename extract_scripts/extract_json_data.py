@@ -29,6 +29,9 @@ extracted_data_dict = {
     "CompressorAlt1": [],
     "CompressorAlt2": [],
     "EnginePower": [],
+    "RPMMin": [],
+    "RPMMax": [],
+    "RPMMaxAllowed": [],
     "CoolingEffectiveAirSpeed": [],
     "WaterBoilingTemperature": [],
     "OilBoilingTemperature": [],
@@ -65,6 +68,8 @@ for filename in json_files:
     data = json_data.get("Mass")
     extracted_data_dict["GearDestructionIndSpeed"].append(data.get("GearDestructionIndSpeed"))
     extracted_data_dict["AirbrakeDestructionIndSpeed"].append(data.get("AirbrakeDestructionIndSpeed"))
+    #todo
+    # - toutes les valeurs de "AirbrakeDestructionIndSpeed" sont soit "None" ou "-1". Pk ?
 
     # Extract Flaps Critical Speed
     data = json_data.get("Mass")
@@ -77,6 +82,12 @@ for filename in json_files:
     extracted_data_dict["CompressorAlt0"].append(extract_compressorStage(json_data,filename)[0])
     extracted_data_dict["CompressorAlt1"].append(extract_compressorStage(json_data,filename)[1])
     extracted_data_dict["CompressorAlt2"].append(extract_compressorStage(json_data,filename)[2])
+
+    # Extract RPM limits
+    extracted_data_dict["RPMMin"].append(extract_RPMLimits(json_data)[0])
+    extracted_data_dict["RPMMax"].append(extract_RPMLimits(json_data)[1])
+    extracted_data_dict["RPMMaxAllowed"].append(extract_RPMLimits(json_data)[2])
+    #fixme - La fonction bug a partir du "a2d.json"
 
     # Extract Mach Critique
     extracted_data_dict["MachCritic1"].append(min(extract_MachCrit(json_data,filename)))

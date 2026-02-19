@@ -179,3 +179,11 @@ def extract_FlapsDestructionIndSpeed(json_data):
     FlapsDestructionIndSpeedP0 = temp_list[2]
 
     return [FlapsDestructionIndSpeedP0,FlapsDestructionIndSpeedP1,FlapsDestructionIndSpeedP2]
+
+def extract_RPMLimits(json_data):
+    Engine = json_data.get("EngineType0")
+    rpm_1 = Engine["Main"]["RPMMin"]
+    rpm_2 = Engine["Main"]["RPMMax"]
+    rpm_3 = Engine["Main"]["RPMMaxAllowed"]
+
+    return [rpm_1,rpm_2,rpm_3]
