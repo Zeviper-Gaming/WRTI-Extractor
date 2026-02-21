@@ -57,21 +57,27 @@ def generate_cfg_files(data_dico):
 
 def import_data_from_dict(data_dico):
    '''
-   Cette fonction récupère pour chaques avions, les données compilés dans data_dico, et va réécrire tous les fichiers
+   Cette fonction récupère pour chaques avions, les données compilés dans extracted_aircraft_data, et va réécrire tous les fichiers
    cfg de chaques avions du dossier "cfg_files" avec les valeurs correspondantes.
    C'est également dans cette fonction que tous les calculs sont générés afin de produire les bonnes valeurs.
    '''
-   for i,name in enumerate(data_dico["Name"]):
+   for i,name in enumerate(data_dico["aircraft"]):
       # Flaps angles and critical speed
-      Fc,Fd,Vc,Vd,Va = get_flaps_crit_speed(data_dico,i)
-      # RPM warning #todo theses variables are not used (rpm_1,rpm_2,rpm_3)
-      rpm_1    = 2.00*  float(data_dico["RPM"][i].split(":")[0])
-      rpm_2    = 1.00*  float(data_dico["RPM"][i].split(":")[1])
-      rpm_3    = 0.95*  float(data_dico["RPM"][i].split(":")[2])
-      # Gear critical speed
-      Vg       = data_dico["CritGearSpd"][i]
-
+      Vc = 0.95* data_dico["FlapsDestructionIndSpeedP0"] # Vitesse volets combats
+      Vd = 0.95* data_dico["FlapsDestructionIndSpeedP1"] # Vitesse volets decollage
+      Va = 0.95* data_dico["FlapsDestructionIndSpeedP2"] # Vitesse volets atterissage
+      Vg = 0.95* data_dico["GearDestructionIndSpeed"] # Vitesse trains atterissage
+      Fc = 20
+      Fd = 30
       Vg_red   = str(int(Vg)*0.8)
+      if Vc is None: Fc,Vc = ("0","0")
+      if Vd is None: Fd,Vd = ("0","0")
+      if Va is None: Va = "0"
+
+      # RPM warning #todo theses variables are not used (rpm_1,rpm_2,rpm_3)
+      rpm_1    = 2.00*  data_dico["RPMMin"]
+      rpm_2    = 1.00*  data_dico["RPMMax"]
+      rpm_3    = 0.95*  data_dico["RPMMaxAllowed"]
       rpm_1    = str(rpm_1)
       rpm_2    = str(rpm_2)
       rpm_3    = str(rpm_3)
