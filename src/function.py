@@ -44,14 +44,14 @@ def generate_cfg_files(data_dico):
    :return:
    '''
    filename = "0-custom.cfg"
-   os.chdir("F:\Github Local\WRTI-Extractor")
+   #os.chdir("F:\Github Local\WRTI-Extractor")
    if TERMINAL == "PC":
       path_source = "datas"  #Dossier de config avec les données
       path_target = "datas/cfg_files"  #Dossier regroupant les fichiers de chaques avions
    elif TERMINAL == "MAC":
       path_source = "/Users/florian/Github Local/WRTI-Extractor/datas"
       path_target = "/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files"
-   for name in data_dico["Name"]:
+   for name in data_dico["aircraft"]:
       if TERMINAL == "PC":    shutil.copy(f"{path_source}/{filename}",f"{path_target}/{name}.cfg")
       if TERMINAL == "MAC":   shutil.copy(f"{path_source}/{filename}",f"{path_target}/{name}.cfg")
 
