@@ -1,5 +1,5 @@
 import os
-import function as func
+import src.function as func
 import MyPack2.Saves.CSV as csv
 
 # Constante
@@ -13,7 +13,7 @@ if IS_UPDATE: # Permet de mettre à jour les données de WTRTI dans ce programme
     print("Data was update")
 
 # load wtrti cfg_files files
-os.chdir("../datas/") # Va dans les dossiers de config de ce programme
+os.chdir("datas/") # Va dans les dossiers de config de ce programme
 #fixme can not load file as dict (see format of csv file (, and ;) )
 dico_fm_data_db = csv.Csv2Dict("fm_data_db.csv") # Charge les caractéristiques des avions depuis ce programme.
 print("Data load into dico")

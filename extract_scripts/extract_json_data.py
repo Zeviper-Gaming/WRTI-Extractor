@@ -1,3 +1,11 @@
+"""
+Ce programme vise a récuperer toute les informations a partir des fichiers JSON pour le regrouper dans le CSV
+INPUT:
+    - Fichiers JSON des avions (dans json_files)
+    - Utilise les fonctions issue de extract_function.py
+OUTPUT: - extracted_aircraft_data.csv (dans DATA)
+
+"""
 # Base pour le programme d'extraction de données des avions
 import json
 import os
