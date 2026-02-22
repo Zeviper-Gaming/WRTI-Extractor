@@ -1252,8 +1252,8 @@
     },
     "FireExtinguisher": {
       "Num": 0,
-      "UseTime": 0.0,
-      "Power": 0.0,
+      "UseTime": 5.0,
+      "Power": 2500.0,
       "Automatic": false
     }
   },
@@ -1343,7 +1343,7 @@
     "MaxFuelMassExternal0": 0.0,
     "FuelAccumulatorCapacity0": 5.0,
     "MinimalLoadFactor0": -0.2,
-    "FuelAccumulatorFlowRate0": 0.5,
+    "FuelAccumulatorFlowRate0": 1.5,
     "FuelEngineFlowRate0": 1000000.0,
     "MaxNitro": 0.0,
     "OilMass": 11.0,
