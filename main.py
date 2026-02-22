@@ -4,8 +4,8 @@ import MyPack2.Saves.CSV as csv
 
 # Constante
 UPDATE_WTRTI_DATA = False           # Update les fichiers issue de war thunder
-GENERATE_CFG_FILES = True
-REPLACE_VARIABLES_IN_CFG = False
+GENERATE_CFG_FILES = False
+REPLACE_VARIABLES_IN_CFG = True
 
 os.chdir("/Users/florian/Github Local/WRTI-Extractor") # Ensure that the code begin in main folder
 
