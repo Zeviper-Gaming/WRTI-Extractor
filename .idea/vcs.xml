@@ -2,5 +2,16 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="D:/OneDrive/Python/MyPack2" vcs="Git" />
+    <mapping directory="D:/OneDrive/Python/Programmes/3D-Solids" vcs="Git" />
+    <mapping directory="D:/OneDrive/Python/Programmes/Aircraft-Stability" vcs="Git" />
+    <mapping directory="D:/OneDrive/Python/Programmes/BattleScribe-Addons" vcs="Git" />
+    <mapping directory="D:/OneDrive/Python/Programmes/CDE-Data-Analyzer" vcs="Git" />
+    <mapping directory="D:/OneDrive/Python/Programmes/DrukenManModel" vcs="Git" />
+    <mapping directory="D:/OneDrive/Python/Programmes/Flight-Simulator" vcs="Git" />
+    <mapping directory="D:/OneDrive/Python/Programmes/GitHub-Test" vcs="Git" />
+    <mapping directory="D:/OneDrive/Python/Programmes/Gravitationnal-Sytem" vcs="Git" />
+    <mapping directory="D:/OneDrive/Python/Programmes/Neural-Network" vcs="Git" />
+    <mapping directory="D:/OneDrive/Python/Programmes/StarSystemGenerator" vcs="Git" />
   </component>
 </project>

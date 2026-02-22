@@ -24,6 +24,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\datas\fm_data_db - Copie.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\datas\fm_data_db.csv">
           <value>
             <Attribute>
