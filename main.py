@@ -1,13 +1,15 @@
 import os
 import src.function as func
 import MyPack2.Saves.CSV as csv
+from MyPack2.Myos import TERMINAL
 
 # Constante
 UPDATE_WTRTI_DATA = False           # Update les fichiers issue de war thunder
 GENERATE_CFG_FILES = False
 REPLACE_VARIABLES_IN_CFG = True
 
-os.chdir("/Users/florian/Github Local/WRTI-Extractor") # Ensure that the code begin in main folder
+if TERMINAL == "MAC": os.chdir("/Users/florian/Github Local/WRTI-Extractor") # Ensure that the code begin in main folder
+if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor") # Ensure that the code begin in main folder
 
 # Update cfg_files or not ?
 if UPDATE_WTRTI_DATA: # Permet de mettre à jour les données de WTRTI dans ce programme.

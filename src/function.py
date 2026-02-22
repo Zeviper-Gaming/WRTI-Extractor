@@ -96,6 +96,7 @@ def import_data_from_dict(data_dico):
          "rpm_2"  : rpm_2,
          "rpm_3"  : rpm_3,
       }
+      import_data_from_extracted_data(data_dico)
       if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor\datas\cfg_files")
       if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files")
       rewrite_cfg_file(f"{name}.cfg",dico_variable)
