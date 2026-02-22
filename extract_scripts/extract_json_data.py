@@ -1,8 +1,18 @@
+"""
+Ce programme vise a récuperer toute les informations a partir des fichiers JSON pour le regrouper dans le CSV
+INPUT:
+    - Fichiers JSON des avions (dans json_files)
+    - Utilise les fonctions issue de extract_function.py
+OUTPUT: - extracted_aircraft_data.csv (dans DATA)
+
+"""
 # Base pour le programme d'extraction de données des avions
 import json
 import os
 from extract_function import *  # Import de la fonction depuis un autre script
 from MyPack2.Saves.CSV import Dict2CSV  # Import de la fonction Dict2CSV
+# DEBUG
+DEBUG = True
 
 # Chemins
 wtrti_data_path = "../datas/fm_data_db.csv"
@@ -16,26 +26,37 @@ extracted_data_dict = {
     "AileronEffectiveSpeed": [],
     "RudderEffectiveSpeed": [],
     "ElevatorsEffectiveSpeed": [],
+    "GearDestructionIndSpeed": [],
+    "AirbrakeDestructionIndSpeed": [],
+    "FlapsDestructionIndSpeedP0": [],
+    "FlapsDestructionIndSpeedP1": [],
+    "FlapsDestructionIndSpeedP2": [],
     "MachCritic1": [],
     "MachCritic2": [],
     "CompressorAlt0": [],
     "CompressorAlt1": [],
     "CompressorAlt2": [],
     "EnginePower": [],
+    "RPMMin": [],
+    "RPMMax": [],
+    "RPMMaxAllowed": [],
     "CoolingEffectiveAirSpeed": [],
     "WaterBoilingTemperature": [],
     "OilBoilingTemperature": [],
 }
 
 # Ouvre la liste des fichiers .json
-json_files = os.listdir(json_folder_path)
+json_files = sorted(os.listdir(json_folder_path))
 print(f"{len(json_files)} fichiers .json trouvés.")
 
 # Extraire les données
 for filename in json_files:
+    if DEBUG: print(filename)
     # Open file
     with open(f"{json_folder_path}/{filename}", 'r') as file:
         json_data = json.load(file)
+    if not json_data:
+        continue
 
     # Extract aircraft name
     aircraft = filename.split(".")[0]
@@ -45,17 +66,37 @@ for filename in json_files:
     stallSpeed = extract_stallSpeed(json_data,filename)
     extracted_data_dict["stallSpeed"].append(stallSpeed)
 
-
     # Extract effective speed
     data = extract_effectiveSpeed(json_data,filename)
     extracted_data_dict["AileronEffectiveSpeed"].append(data["AileronEffectiveSpeed"])
     extracted_data_dict["RudderEffectiveSpeed"].append(data["RudderEffectiveSpeed"])
     extracted_data_dict["ElevatorsEffectiveSpeed"].append(data["ElevatorsEffectiveSpeed"])
 
+    # Extract Gear and Airbrakes Critical Speed
+    data = json_data.get("Mass")
+    extracted_data_dict["GearDestructionIndSpeed"].append(data.get("GearDestructionIndSpeed"))
+    extracted_data_dict["AirbrakeDestructionIndSpeed"].append(data.get("AirbrakeDestructionIndSpeed"))
+    #todo
+    # - toutes les valeurs de "AirbrakeDestructionIndSpeed" sont soit "None" ou "-1". Pk ?
+
+    # Extract Flaps Critical Speed
+    data = json_data.get("Mass")
+    data_FlapsDestrcutionSpeed = extract_FlapsDestructionIndSpeed(json_data)
+    extracted_data_dict["FlapsDestructionIndSpeedP0"].append(data_FlapsDestrcutionSpeed[0])
+    extracted_data_dict["FlapsDestructionIndSpeedP1"].append(data_FlapsDestrcutionSpeed[1])
+    extracted_data_dict["FlapsDestructionIndSpeedP2"].append(data_FlapsDestrcutionSpeed[2])
+
     # Extract compressor Altitudes
     extracted_data_dict["CompressorAlt0"].append(extract_compressorStage(json_data,filename)[0])
     extracted_data_dict["CompressorAlt1"].append(extract_compressorStage(json_data,filename)[1])
     extracted_data_dict["CompressorAlt2"].append(extract_compressorStage(json_data,filename)[2])
+
+    # Extract RPM limits
+    RPM_data = extract_RPMLimits(json_data)
+    extracted_data_dict["RPMMin"].append(RPM_data[0])
+    extracted_data_dict["RPMMax"].append(RPM_data[1])
+    extracted_data_dict["RPMMaxAllowed"].append(RPM_data[2])
+    #fixme - La fonction bug a partir du "a2d.json"
 
     # Extract Mach Critique
     extracted_data_dict["MachCritic1"].append(min(extract_MachCrit(json_data,filename)))

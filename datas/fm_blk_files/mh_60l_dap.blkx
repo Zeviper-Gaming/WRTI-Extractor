@@ -1815,7 +1815,7 @@
   "Mass": {
     "EmptyMass": 5690.0,
     "MaxFuelMass0": 1110.0,
-    "FuelAccumulatorCapacity0": 0.4,
+    "FuelAccumulatorCapacity0": 1.4,
     "MinimalLoadFactor0": -0.5,
     "FuelAccumulatorFlowRate0": 1.4,
     "FuelEngineFlowRate0": 1000000.0,
@@ -2538,7 +2538,7 @@
       ],
       "OverridenRollLim": 30.0,
       "PitchMax": 20.0,
-      "PitchRateMax": 30.0,
+      "PitchRateMax": 50.0,
       "PitchLim": 20.0,
       "YawHeadingToYawRateMultByIas": [
         0.0,

@@ -44,34 +44,42 @@ def generate_cfg_files(data_dico):
    :return:
    '''
    filename = "0-custom.cfg"
-   os.chdir("F:\Github Local\WRTI-Extractor")
+   #os.chdir("F:\Github Local\WRTI-Extractor")
    if TERMINAL == "PC":
       path_source = "datas"  #Dossier de config avec les données
       path_target = "datas/cfg_files"  #Dossier regroupant les fichiers de chaques avions
    elif TERMINAL == "MAC":
       path_source = "/Users/florian/Github Local/WRTI-Extractor/datas"
       path_target = "/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files"
-   for name in data_dico["Name"]:
+   for name in data_dico["aircraft"]:
       if TERMINAL == "PC":    shutil.copy(f"{path_source}/{filename}",f"{path_target}/{name}.cfg")
       if TERMINAL == "MAC":   shutil.copy(f"{path_source}/{filename}",f"{path_target}/{name}.cfg")
 
 def import_data_from_dict(data_dico):
    '''
-   Cette fonction récupère pour chaques avions, les données compilés dans data_dico, et va réécrire tous les fichiers
+   Cette fonction récupère pour chaques avions, les données compilés dans extracted_aircraft_data, et va réécrire tous les fichiers
    cfg de chaques avions du dossier "cfg_files" avec les valeurs correspondantes.
    C'est également dans cette fonction que tous les calculs sont générés afin de produire les bonnes valeurs.
    '''
-   for i,name in enumerate(data_dico["Name"]):
+   for i,name in enumerate(data_dico["aircraft"]):
+      print(f"rewriting {name}...")
       # Flaps angles and critical speed
-      Fc,Fd,Vc,Vd,Va = get_flaps_crit_speed(data_dico,i)
-      # RPM warning #todo theses variables are not used (rpm_1,rpm_2,rpm_3)
-      rpm_1    = 2.00*  float(data_dico["RPM"][i].split(":")[0])
-      rpm_2    = 1.00*  float(data_dico["RPM"][i].split(":")[1])
-      rpm_3    = 0.95*  float(data_dico["RPM"][i].split(":")[2])
-      # Gear critical speed
-      Vg       = data_dico["CritGearSpd"][i]
-
+      Vc = data_dico["FlapsDestructionIndSpeedP0"][i] # Vitesse volets combats
+      Vd = data_dico["FlapsDestructionIndSpeedP1"][i] # Vitesse volets decollage
+      Va = data_dico["FlapsDestructionIndSpeedP2"][i] # Vitesse volets atterissage
+      Vg = data_dico["GearDestructionIndSpeed"][i] # Vitesse trains atterissage
+      Fc = 20
+      Fd = 30
+      if Vc == "None": Fc,Vc = (0,0)
+      if Vd == "None": Fd,Vd = (0,0)
+      if Va == "None": Va = 0
+      if Vg == "None": Vg = 0
       Vg_red   = str(int(Vg)*0.8)
+
+      # RPM warning #todo theses variables are not used (rpm_1,rpm_2,rpm_3)
+      rpm_1    = 2.00*  data_dico["RPMMin"][i]
+      rpm_2    = 1.00*  data_dico["RPMMax"][i]
+      rpm_3    = 0.95*  data_dico["RPMMaxAllowed"][i]
       rpm_1    = str(rpm_1)
       rpm_2    = str(rpm_2)
       rpm_3    = str(rpm_3)
@@ -169,13 +177,16 @@ def import_data_from_extracted_data(data_dico):
          pass
 
 def rewrite_cfg_file(filename,variables):
-   with open(filename,"r") as current_file:
-      all_file_lines = current_file.readlines()
-   with open(filename,"w") as current_file:
-      for ligne in all_file_lines:
-         for variable,valeur in variables.items():
-            ligne = ligne.replace(variable,valeur)
-         current_file.write(ligne)
+    """
+    Modifiee les variable dans les cfg files par leurs valeurs
+    """
+    with open(filename,"r") as current_file:
+        all_file_lines = current_file.readlines()
+    with open(filename,"w") as current_file:
+        for ligne in all_file_lines:
+            for variable,valeur in variables.items():
+                ligne = ligne.replace(variable,valeur)
+            current_file.write(ligne)
 
 def get_flaps_crit_speed(data_dico,index):
    i = index

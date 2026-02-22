@@ -151,3 +151,44 @@ def extract_RadiatorSpeed(json_data, filename):
         pass
 
     return [RadiatorSpeed,WaterBoilingTemperature,OilBoilingTemperature]
+
+def extract_FlapsDestructionIndSpeed(json_data):
+    mass = json_data.get("Mass")
+    # Recuperation des valeurs si elles existent
+    P = mass.get("FlapsDestructionIndSpeedP")
+    P0 = mass.get("FlapsDestructionIndSpeedP0")
+    P1 = mass.get("FlapsDestructionIndSpeedP1")
+    P2 = mass.get("FlapsDestructionIndSpeedP2")
+    P3 = mass.get("FlapsDestructionIndSpeedP3")
+    P4 = mass.get("FlapsDestructionIndSpeedP4")
+    temp_list = []
+
+    for p in [P,P0,P1,P2,P3,P4]:
+        if p is None:
+            temp_list.append(None)
+        elif type(p[0]) == float: temp_list.append(p[1])
+        elif type(p[0]) == list:
+            for el in p: temp_list.append(el[1])
+        else:
+            TypeError("[ZV] Type de valeurs non reconnue")
+
+    temp_list = sorted(temp_list,key = lambda x:(x is None,x))
+
+    FlapsDestructionIndSpeedP2 = temp_list[0]
+    FlapsDestructionIndSpeedP1 = temp_list[1]
+    FlapsDestructionIndSpeedP0 = temp_list[2]
+
+    return [FlapsDestructionIndSpeedP0,FlapsDestructionIndSpeedP1,FlapsDestructionIndSpeedP2]
+
+def extract_RPMLimits(json_data):
+    Engine = [json_data.get("EngineType0"),json_data.get("Engine0"),json_data.get("EngineType1"),json_data.get("EngineType2"),json_data.get("EngineType3")]
+    for el in Engine:
+        try:
+            rpm_1 = el["Main"]["RPMMin"]
+            rpm_2 = el["Main"]["RPMMax"]
+            rpm_3 = el["Main"]["RPMMaxAllowed"]
+            break
+        except:
+            continue
+
+    return [rpm_1,rpm_2,rpm_3]

@@ -2,10 +2,16 @@
   "IgnoreErrors": true,
   "AileronEffectiveSpeed": 440.0,
   "RudderEffectiveSpeed": 430.0,
-  "ElevatorsEffectiveSpeed": 530.0,
+  "ElevatorsEffectiveSpeed": [
+    530.0,
+    530.0
+  ],
   "AileronPowerLoss": 2.2,
   "RudderPowerLoss": 2.0,
-  "ElevatorPowerLoss": 3.0,
+  "ElevatorPowerLoss": [
+    3.0,
+    3.0
+  ],
   "AlphaAileronMin": 0.1,
   "AlphaRudderMin": 0.1,
   "AlphaElevatorMin": 0.1,
@@ -41,6 +47,18 @@
     280.0,
     0.11,
     0.08
+  ],
+  "flapsLimByMach": [
+    0.95,
+    0.99,
+    1.0,
+    0.0
+  ],
+  "flapsLimByIas": [
+    180.0,
+    315.0,
+    1.0,
+    0.0
   ],
   "Wingspan": 12.49,
   "SweptWingAngle": 0.0,
@@ -81,11 +99,11 @@
   "AllowModsToChangeLongidutialBalance": true,
   "ArcadeRollCorrectionMultiplier": 1.0,
   "ArcadeMaxRollCoeff": 1.0,
-  "ArcadeYawMutilpliers": [
-    1.0,
+  "ArcadeYawModificators": [
     1.0,
     1.0
   ],
+  "ArcadeRudderSensMultiplier": 1.0,
   "MomentOfInertia": [
     16000.0,
     37000.0,
@@ -106,8 +124,6 @@
     "dvRudderTrim": 0.125,
     "hasFlapsControl": true,
     "canTakeoffWithoutFlaps": true,
-    "hasTakeoffFlapsPosition": true,
-    "hasCombatFlapsPosition": true,
     "hasAirbrake": false,
     "hasGearControl": true,
     "hasArrestorControl": false,
@@ -115,7 +131,25 @@
     "hasCockpitDoorControl": false,
     "hasWheelBrakeControl": true,
     "hasLockGearControl": true,
-    "bHasBoosterSwitcher": false
+    "bHasBoosterSwitcher": false,
+    "flapsLimits": {
+      "mechRangeOnGround": [
+        0.0,
+        1.0
+      ],
+      "mechLockIas": 315.0,
+      "secondaryMech": "sweep",
+      "secondaryMechRange": [
+        0.0,
+        0.01
+      ],
+      "secondaryMechDependentRange": [
+        0.0,
+        0.0
+      ],
+      "forcedSecondaryMechValue": -1.0,
+      "applySecondaryMechRequiredValue": false
+    }
   },
   "Areas": {
     "WingLeftIn": 5.7,
@@ -185,7 +219,8 @@
     "AfterCritParabAngle": 3.0,
     "AfterCritDeclineCoeff": 0.035,
     "AfterCritMaxDistanceAngle": 33.0,
-    "ClAfterCrit": 0.75,
+    "ClAfterCritHigh": 0.75,
+    "ClAfterCritLow": -0.75,
     "MachFactor": 3,
     "MachCrit1": 0.72,
     "MachMax1": 1.0,
@@ -222,6 +257,24 @@
     "DownwashCoeff": 1.0,
     "StabFlowInertia": 0.04,
     "VertStabFlowInertia": 0.03,
+    "FlapsAxis": {
+      "Retracted": {
+        "Presents": true,
+        "Flaps": 0.0
+      },
+      "Combat": {
+        "Presents": true,
+        "Flaps": 0.2
+      },
+      "Takeoff": {
+        "Presents": true,
+        "Flaps": 0.33
+      },
+      "Landing": {
+        "Presents": true,
+        "Flaps": 1.0
+      }
+    },
     "NoFlaps": {
       "Cl0": 0.02,
       "alphaCritHigh": 15.7,
@@ -244,7 +297,8 @@
       "AfterCritParabAngle": 3.0,
       "AfterCritDeclineCoeff": 0.0007,
       "AfterCritMaxDistanceAngle": 30.0,
-      "ClAfterCrit": 0.08,
+      "ClAfterCritHigh": 0.08,
+      "ClAfterCritLow": -0.08,
       "MachFactor": 3,
       "MachCrit1": 0.77,
       "MachMax1": 1.0,
@@ -290,7 +344,8 @@
       "AfterCritParabAngle": 5.0,
       "AfterCritDeclineCoeff": 0.007,
       "AfterCritMaxDistanceAngle": 30.0,
-      "ClAfterCrit": 0.91,
+      "ClAfterCritHigh": 0.91,
+      "ClAfterCritLow": -0.91,
       "MachFactor": 3,
       "MachCrit1": 0.68,
       "MachMax1": 1.0,
@@ -336,7 +391,8 @@
       "AfterCritParabAngle": 5.0,
       "AfterCritDeclineCoeff": 0.007,
       "AfterCritMaxDistanceAngle": 35.0,
-      "ClAfterCrit": 0.91,
+      "ClAfterCritHigh": 0.91,
+      "ClAfterCritLow": -0.91,
       "MachFactor": 3,
       "MachCrit1": 0.75,
       "MachMax1": 1.0,
@@ -468,7 +524,7 @@
       "CoaxProps": false,
       "ThrottleRPMAuto0": [
         0.0,
-        1500.0
+        1000.0
       ],
       "ThrottleRPMAuto1": [
         0.5,
@@ -497,7 +553,8 @@
         "AfterCritParabAngle": 3.0,
         "AfterCritDeclineCoeff": 0.0222,
         "AfterCritMaxDistanceAngle": 36.0,
-        "ClAfterCrit": 1.09,
+        "ClAfterCritHigh": 1.09,
+        "ClAfterCritLow": -1.09,
         "MachFactor": 3,
         "CombinedCl": false,
         "MachCrit1": 0.84,
