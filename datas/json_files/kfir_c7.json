@@ -136,7 +136,7 @@
       0.12
     ]
   ],
-  "maxChuteSpeed": 277.0,
+  "maxChuteSpeed": 351.9,
   "minChuteSpeed": 50.0,
   "chuteRipSpeed": 450.0,
   "Length": 15.01,
@@ -209,7 +209,7 @@
     "hasCockpitDoorControl": true,
     "hasWheelBrakeControl": true,
     "hasLockGearControl": false,
-    "bHasBoosterSwitcher": true,
+    "bHasBoosterSwitcher": false,
     "hasChutes": true,
     "hasParkingBrakeControl": false,
     "hasLightsControl": false,
@@ -1629,12 +1629,14 @@
     "MaxFuelMass0": 3285.0,
     "FuelAccumulatorCapacity0": 70.0,
     "MinimalLoadFactor0": -0.3,
-    "FuelAccumulatorFlowRate0": 7.5,
+    "FuelAccumulatorFlowRate0": 9.0,
     "FuelEngineFlowRate0": 1000000.0,
     "FuelAccumulatorCapacity1": 0.0,
     "MinimalLoadFactor1": -20.5,
     "FuelAccumulatorFlowRate1": 300.5,
     "FuelEngineFlowRate1": 1000000.0,
+    "hasFuelDumping": true,
+    "fuelDumpingRate": 10.0,
     "MaxNitro": 0.0,
     "OilMass": 10.0,
     "AdvancedMass": false,
@@ -1646,7 +1648,7 @@
       -0.09,
       0.0
     ],
-    "GearDestructionIndSpeed": 426.0,
+    "GearDestructionIndSpeed": 500.0,
     "AirbrakeDestructionIndSpeed": -1.0,
     "FlapsDestructionIndSpeedP0": [
       0.2,
