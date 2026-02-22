@@ -4,8 +4,8 @@ import MyPack2.Saves.CSV as csv
 
 # Constante
 UPDATE_WTRTI_DATA = False           # Update les fichiers issue de war thunder
-GENERATE_CFG_FILES = False
-REPLACE_VARIABLES_IN_CFG = True
+GENERATE_CFG_FILES = True
+REPLACE_VARIABLES_IN_CFG = False
 
 os.chdir("/Users/florian/Github Local/WRTI-Extractor") # Ensure that the code begin in main folder
 
@@ -21,7 +21,7 @@ data_dico = csv.Csv2Dict("extracted_aircraft_data.csv") # Charge le CSV contenan
 print("Data load into dico")
 
 if GENERATE_CFG_FILES:
-    func.generate_cfg_files(data_dico) # Génere un "cfg" brut pour chaques profile dans "dico_fm_data_db"
+    func.generate_cfg_files(data_dico) # Génere un "cfg" brut pour chaques profile dans "extracted_aircraft_data.csv"
 
 if REPLACE_VARIABLES_IN_CFG:
     func.import_data_from_dict(data_dico) # Calcul et modifie les valeurs des fichiers "cfg" pour chaques avions.
