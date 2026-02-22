@@ -62,22 +62,24 @@ def import_data_from_dict(data_dico):
    C'est également dans cette fonction que tous les calculs sont générés afin de produire les bonnes valeurs.
    '''
    for i,name in enumerate(data_dico["aircraft"]):
+      print(f"rewriting {name}...")
       # Flaps angles and critical speed
-      Vc = 0.95* data_dico["FlapsDestructionIndSpeedP0"] # Vitesse volets combats
-      Vd = 0.95* data_dico["FlapsDestructionIndSpeedP1"] # Vitesse volets decollage
-      Va = 0.95* data_dico["FlapsDestructionIndSpeedP2"] # Vitesse volets atterissage
-      Vg = 0.95* data_dico["GearDestructionIndSpeed"] # Vitesse trains atterissage
+      Vc = data_dico["FlapsDestructionIndSpeedP0"][i] # Vitesse volets combats
+      Vd = data_dico["FlapsDestructionIndSpeedP1"][i] # Vitesse volets decollage
+      Va = data_dico["FlapsDestructionIndSpeedP2"][i] # Vitesse volets atterissage
+      Vg = data_dico["GearDestructionIndSpeed"][i] # Vitesse trains atterissage
       Fc = 20
       Fd = 30
+      if Vc == "None": Fc,Vc = (0,0)
+      if Vd == "None": Fd,Vd = (0,0)
+      if Va == "None": Va = 0
+      if Vg == "None": Vg = 0
       Vg_red   = str(int(Vg)*0.8)
-      if Vc is None: Fc,Vc = ("0","0")
-      if Vd is None: Fd,Vd = ("0","0")
-      if Va is None: Va = "0"
 
       # RPM warning #todo theses variables are not used (rpm_1,rpm_2,rpm_3)
-      rpm_1    = 2.00*  data_dico["RPMMin"]
-      rpm_2    = 1.00*  data_dico["RPMMax"]
-      rpm_3    = 0.95*  data_dico["RPMMaxAllowed"]
+      rpm_1    = 2.00*  data_dico["RPMMin"][i]
+      rpm_2    = 1.00*  data_dico["RPMMax"][i]
+      rpm_3    = 0.95*  data_dico["RPMMaxAllowed"][i]
       rpm_1    = str(rpm_1)
       rpm_2    = str(rpm_2)
       rpm_3    = str(rpm_3)
@@ -175,13 +177,16 @@ def import_data_from_extracted_data(data_dico):
          pass
 
 def rewrite_cfg_file(filename,variables):
-   with open(filename,"r") as current_file:
-      all_file_lines = current_file.readlines()
-   with open(filename,"w") as current_file:
-      for ligne in all_file_lines:
-         for variable,valeur in variables.items():
-            ligne = ligne.replace(variable,valeur)
-         current_file.write(ligne)
+    """
+    Modifiee les variable dans les cfg files par leurs valeurs
+    """
+    with open(filename,"r") as current_file:
+        all_file_lines = current_file.readlines()
+    with open(filename,"w") as current_file:
+        for ligne in all_file_lines:
+            for variable,valeur in variables.items():
+                ligne = ligne.replace(variable,valeur)
+            current_file.write(ligne)
 
 def get_flaps_crit_speed(data_dico,index):
    i = index
