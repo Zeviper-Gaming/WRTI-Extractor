@@ -23,7 +23,7 @@ SYNC_CFG_TO_WTRTI = False           # Copie les .cfg de ce programme vers le dos
 SYNC_DRY_RUN = True                 # True = aperçu sans rien modifier, False = applique réellement la copie
 
 if TERMINAL == "MAC": os.chdir("/Users/florian/Github Local/WRTI-Extractor") # Ensure that the code begin in main folder
-if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor") # Ensure that the code begin in main folder
+if TERMINAL == "PC": os.chdir(r"F:\Github Local\WRTI-Extractor") # Ensure that the code begin in main folder
 
 # Update cfg_files or not ?
 if UPDATE_WTRTI_DATA: # Permet de mettre à jour les données de WTRTI dans ce programme.
@@ -40,7 +40,8 @@ if GENERATE_CFG_FILES:
     func.generate_cfg_files(data_dico) # Génere un "cfg" brut pour chaques profile dans "extracted_aircraft_data.csv"
 
 if REPLACE_VARIABLES_IN_CFG:
-    func.import_data_from_dict(data_dico) # Calcul et modifie les valeurs des fichiers "cfg" pour chaques avions.
+    func.import_data_from_dict(data_dico) # Calcul et modifie les valeurs (volets/RPM) des fichiers "cfg" pour chaques avions.
+    func.import_data_from_extracted_data(data_dico) # Calcul et modifie les valeurs (vitesses/altitudes/puissance) des fichiers "cfg" pour chaques avions.
 
 if SYNC_CFG_TO_WTRTI:
     func.sync_cfg_to_wtrti(dry_run=SYNC_DRY_RUN) # Copie les .cfg vers le dossier de profils WTRTI (avec backup automatique)

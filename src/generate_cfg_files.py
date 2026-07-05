@@ -14,7 +14,7 @@ if TERMINAL == "PC": os.chdir("/")
 if TERMINAL == "MAC": os.chdir("/Users/florian/Github Local/WRTI-Extractor")
 
 # Charge les données de config de ce programme dans un dico
-os.chdir("F:\Github Local\WRTI-Extractor\datas")
+os.chdir(r"F:\Github Local\WRTI-Extractor\datas")
 dico_fm_data_db = csv.Csv2Dict("fm_data_db.csv")
 dico_extracted_data = csv.Csv2Dict("extracted_aircraft_data.csv")
 print("Data load into dico")

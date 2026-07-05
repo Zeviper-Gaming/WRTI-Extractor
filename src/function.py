@@ -35,7 +35,7 @@ def update_wtrti_data():
    :return:
    '''
    # Se déplace dans le dossier des fichier csv de WTRTI
-   if TERMINAL == "PC":    os.chdir("D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\FM")
+   if TERMINAL == "PC":    os.chdir(r"D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\FM")
    if TERMINAL == "MAC":   print("Wrong Terminal")
    with open("fm_data_db.csv","r") as source_file:
       os.chdir("/datas") # Se déplace dans le dossier de config de ce programme
@@ -68,9 +68,14 @@ def generate_cfg_files(data_dico):
 
 def import_data_from_dict(data_dico):
    '''
-   Cette fonction récupère pour chaques avions, les données compilés dans extracted_aircraft_data, et va réécrire tous les fichiers
-   cfg de chaques avions du dossier "cfg_files" avec les valeurs correspondantes.
-   C'est également dans cette fonction que tous les calculs sont générés afin de produire les bonnes valeurs.
+   Calcule et écrit dans les .cfg de chaque avion les variables liées aux volets/train (Fc, Fd,
+   Vc, Va, Vg...) et aux seuils RPM (rpm_1/2/3), à partir de data_dico.
+
+   Ne calcule PAS les autres variables (Vred, Alt*, Power*, Cooling...) : celles-ci sont gérées
+   par import_data_from_extracted_data(), à appeler séparément (voir main.py). Les deux fonctions
+   étaient auparavant imbriquées l'une dans l'autre par erreur (import_data_from_extracted_data
+   était rappelée à chaque itération de cette boucle), ce qui multipliait le temps de traitement
+   par le nombre d'avions (des minutes au lieu de quelques secondes) - corrigé.
    '''
    for i,name in enumerate(data_dico["aircraft"]):
       print(f"rewriting {name}...")
@@ -107,8 +112,7 @@ def import_data_from_dict(data_dico):
          "rpm_2"  : rpm_2,
          "rpm_3"  : rpm_3,
       }
-      import_data_from_extracted_data(data_dico)
-      if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor\datas\cfg_files")
+      if TERMINAL == "PC": os.chdir(r"F:\Github Local\WRTI-Extractor\datas\cfg_files")
       if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files")
       rewrite_cfg_file(f"{name}.cfg",dico_variable)
 
@@ -346,7 +350,7 @@ def import_data_from_extracted_data(data_dico):
         "WaterT" : str(WaterT),
       }
 
-      if TERMINAL == "PC": os.chdir("F:\Github Local\WRTI-Extractor\datas\cfg_files")
+      if TERMINAL == "PC": os.chdir(r"F:\Github Local\WRTI-Extractor\datas\cfg_files")
       if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files")
       try:
          rewrite_cfg_file(f"{name}.cfg", dico_variable)
