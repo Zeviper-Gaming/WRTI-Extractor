@@ -1,3 +1,13 @@
+"""
+extract_function.py - Boîte à outils utilisée par extract_json_data.py.
+
+Regroupe toutes les fonctions "extract_xxx" qui vont chercher, dans le JSON brut d'un
+avion (issu de blk2json.py), une caractéristique de vol précise (vitesse de décrochage,
+vitesses effectives des gouvernes, altitudes de compresseur, Mach critique, puissance
+moteur, limites RPM, températures de refroidissement...). Chaque fonction gère les
+variations de structure JSON selon les avions/versions du jeu (clés "EngineType0" vs
+"Engine0", valeurs simples vs listes, etc.).
+"""
 import json
 import os
 from MyPack2.Utilities import truncDecimal

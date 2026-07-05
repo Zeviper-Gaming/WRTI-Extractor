@@ -1,18 +1,21 @@
 '''
-Ce script a pour but de remplacer automatiquement les cfg files dans le logiciel WTRTI par ceux du dossier "DATA"
-dans le but de faire une maj avec avec ce programme
+Copie automatiquement les .cfg generes par ce programme ("datas/cfg_files") vers le dossier
+de profils WTRTI, pour ne plus avoir a faire le copier-coller a la main.
+
+Par defaut ce script tourne en mode "dry run" : il affiche ce qu'il ferait sans rien modifier.
+Ajouter l'option --apply pour effectuer reellement la copie (un backup des fichiers ecrases
+est automatiquement cree dans "datas/backup_wtrti_cfg/<horodatage>/").
+
+Usage :
+    python replace_cfg_files.py            -> apercu, aucun fichier modifie
+    python replace_cfg_files.py --apply     -> applique reellement la synchronisation
 '''
-#TODO Fichier interrompu, je ne suis pas sur de le continuer par peur de "casser" les fichiers de WTRTI. A VOIR...
-from MyPack2.Myos import TERMINAL
-from generate_cfg_files import dico_fm_data_db
-import shutil
+import os
+import sys
 
-# Verifie le bon terminal pour faire la MAJ des profiles dans WTRTI
-assert TERMINAL == "PC" , "Wrong terminal !! Try to use on PC instead"
-path_target_folder  = "D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\profiles"
-path_source_folder  = "/cfg_files"
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))  # permet "import function" en lancant ce script directement
+import function as func
 
-# Liste les noms des profiles des cfg
-list_profiles = dico_fm_data_db["Name"]
-for i,name in enumerate(list_profiles):
-    shutil.copy(f"{path_source_folder}/{name}.cfg",f"{path_target_folder}/{name}.cfg")
+if __name__ == "__main__":
+    apply_changes = "--apply" in sys.argv
+    func.sync_cfg_to_wtrti(dry_run=not apply_changes, make_backup=True)

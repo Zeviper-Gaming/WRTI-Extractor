@@ -1,3 +1,12 @@
+"""
+blk2json.py - Première étape du pipeline d'extraction des données avions.
+
+Copie tous les fichiers ".blkx" bruts exportés de War Thunder (dossier
+"datas/fm_blk_files") vers "datas/json_files" en les renommant simplement en ".json"
+(les .blkx sont déjà au format JSON, seule l'extension change).
+
+À lancer avant extract_json_data.py dès qu'il y a de nouveaux .blkx à traiter.
+"""
 import os
 import shutil
 

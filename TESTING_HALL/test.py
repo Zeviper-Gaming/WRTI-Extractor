@@ -1,3 +1,11 @@
+"""
+test.py - Script d'exploration ponctuel (TESTING_HALL, non utilisé en production).
+
+Vérifie la qualité des données d'un CSV (fm_data_db.csv, extracted_aircraft_data.csv...)
+en comptant, pour chaque colonne, le nombre de valeurs manquantes ("None"). Le bloc
+commenté en bas de fichier montre un exemple d'appel manuel à import_data_from_dict()
+pour retester la génération des .cfg sur un jeu de données.
+"""
 import os
 
 import MyPack2.Saves.CSV as csv

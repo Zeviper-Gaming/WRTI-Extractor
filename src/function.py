@@ -1,6 +1,16 @@
+"""
+function.py - Cœur du programme : toutes les fonctions utilisées par main.py (et par les
+scripts de src/) pour générer les fichiers .cfg de chaque avion, calculer et y écrire les
+bonnes valeurs, puis les synchroniser vers WTRTI.
+
+Contient aussi quelques fonctions d'exploration/debug autour des données de compresseur
+moteur (extract_compressor_data, create_spline, plot_compressor_graph), indépendantes du
+pipeline de génération des .cfg et utilisées ponctuellement depuis TESTING_HALL/.
+"""
 import os
 import shutil
 import json
+from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import make_interp_spline
@@ -188,6 +198,74 @@ def rewrite_cfg_file(filename,variables):
             for variable,valeur in variables.items():
                 ligne = ligne.replace(variable,valeur)
             current_file.write(ligne)
+
+def sync_cfg_to_wtrti(dry_run=True, make_backup=True):
+   """
+   Copie automatiquement tous les fichiers .cfg de "datas/cfg_files" (générés par ce programme)
+   vers le dossier de profils de WTRTI, pour ne plus avoir à faire le copier-coller a la main.
+
+   Par sécurité :
+   - dry_run=True (valeur par défaut) : ne modifie rien, affiche juste ce qui serait fait.
+     Repasser dry_run=False une fois que l'aperçu te convient pour appliquer réellement la copie.
+   - make_backup=True (valeur par défaut) : avant d'écraser un .cfg déjà présent côté WTRTI,
+     en garde une copie dans "datas/backup_wtrti_cfg/<horodatage>/" pour pouvoir revenir en arrière.
+
+   :param dry_run: bool, si True n'effectue aucune écriture (aperçu uniquement).
+   :param make_backup: bool, si True sauvegarde les fichiers existants avant de les écraser.
+   :return: dict {"copied": [...], "backed_up": [...], "skipped": [...]} ou None si le terminal
+            n'est pas compatible (la synchronisation ne fonctionne que depuis PC, le dossier
+            WTRTI étant sur OneDrive Windows).
+   """
+   if TERMINAL == "MAC":
+      print("Wrong Terminal : la synchronisation vers WTRTI ne peut se faire que depuis PC (dossier OneDrive Windows).")
+      return None
+   if TERMINAL != "PC":
+      raise ValueError(f"TERMINAL inconnu : {TERMINAL}")
+
+   path_source = r"F:\Github Local\WRTI-Extractor\datas\cfg_files"
+   path_target = r"D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\Profiles"
+
+   if not os.path.isdir(path_source):
+      raise FileNotFoundError(f"Dossier source introuvable : {path_source}")
+   if not os.path.isdir(path_target):
+      raise FileNotFoundError(f"Dossier cible introuvable : {path_target}")
+
+   result = {"copied": [], "backed_up": [], "skipped": []}
+
+   backup_dir = None
+   if make_backup and not dry_run:
+      timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+      backup_dir = os.path.normpath(os.path.join(path_source, os.pardir, "backup_wtrti_cfg", timestamp))
+      os.makedirs(backup_dir, exist_ok=True)
+
+   cfg_files = sorted(f for f in os.listdir(path_source) if f.endswith(".cfg"))
+   print(f"{len(cfg_files)} fichiers .cfg trouvés dans {path_source}")
+
+   for filename in cfg_files:
+      source_path = os.path.join(path_source, filename)
+      target_path = os.path.join(path_target, filename)
+      target_exists = os.path.isfile(target_path)
+
+      if dry_run:
+         action = "écraserait" if target_exists else "créerait"
+         print(f"[DRY RUN] {action} : {filename}")
+         result["skipped"].append(filename)
+         continue
+
+      if target_exists and make_backup:
+         shutil.copy(target_path, os.path.join(backup_dir, filename))
+         result["backed_up"].append(filename)
+
+      shutil.copy(source_path, target_path)
+      result["copied"].append(filename)
+      print(f"Copié : {filename}")
+
+   if dry_run:
+      print("Dry run terminé, aucun fichier n'a été modifié. Relance avec dry_run=False pour appliquer la synchronisation.")
+   else:
+      print(f"Terminé : {len(result['copied'])} fichiers copiés, {len(result['backed_up'])} sauvegardés dans {backup_dir}.")
+
+   return result
 
 def get_flaps_crit_speed(data_dico,index):
    i = index

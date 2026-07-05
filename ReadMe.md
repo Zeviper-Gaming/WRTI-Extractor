@@ -117,13 +117,19 @@ REPLACE_VARIABLES_IN_CFG = True
 
 C'est l'étape qui fait le vrai travail : elle lit `fm_data_db.csv` et `extracted_aircraft_data.csv`, calcule les seuils (vitesses volets, RPM, puissance moteur, altitudes...) et remplace les variables correspondantes (`Vc`, `Vd`, `Power100`, `Alt11`...) directement dans le texte de chaque `.cfg`.
 
-### Étape 4 — Installer les profils dans War Thunder
+### Étape 4 — Installer les profils dans War Thunder (automatique)
 
-Une fois les `.cfg` régénérés dans `datas/cfg_files/`, il suffit de les copier-coller dans le dossier de profils de WTRTI, par exemple :
+Une fois les `.cfg` régénérés dans `datas/cfg_files/`, plus besoin de copier-coller à la main : `func.sync_cfg_to_wtrti()` (module `src/function.py`) copie tous les `.cfg` vers le dossier de profils de WTRTI (`D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\Profiles`).
 
-```
-D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\Profiles
-```
+Deux façons de l'utiliser :
+
+- **Depuis `main.py`** : activer `SYNC_CFG_TO_WTRTI = True` (et laisser `SYNC_DRY_RUN = True` pour un aperçu sans rien modifier, ou `False` pour appliquer réellement).
+- **Directement** : `python src/replace_cfg_files.py` (aperçu) ou `python src/replace_cfg_files.py --apply` (applique).
+
+Par sécurité :
+- **Mode aperçu par défaut** (`dry_run=True`) : la fonction affiche ce qu'elle ferait sans rien écrire.
+- **Backup automatique** : avant d'écraser un `.cfg` déjà présent côté WTRTI, une copie est faite dans `datas/backup_wtrti_cfg/<horodatage>/`, pour pouvoir revenir en arrière en cas de souci.
+- Ne fonctionne que depuis PC (le dossier WTRTI est sur un OneDrive Windows).
 
 ## Ajouter un nouvel avion
 
@@ -134,7 +140,6 @@ D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\Profiles
 ## Points d'attention
 
 - Les chemins de dossiers sont actuellement écrits en dur dans le code (`F:\Github Local\WRTI-Extractor`, `/Users/florian/...`, `D:\OneDrive\...`) et adaptés au cas par cas via `MyPack2.Myos.TERMINAL` (`"PC"` ou `"MAC"`). Vérifier ces chemins si l'arborescence change.
-- `src/replace_cfg_files.py` est marqué comme inachevé dans le code (peur d'écraser des profils WTRTI existants) — à ne pas utiliser tel quel sans relecture.
 - Le champ `AirbrakeDestructionIndSpeed` extrait des `.json` est presque toujours `None` ou `-1` et n'est pas encore exploité.
 - `datas/fm_data_db.csv` contient des lignes ajoutées à la main pour des avions sans profil de base ; ces lignes ne sont pas présentes dans `fm_data_db - Copie.csv` (backup).
 - `json_info.md` sert de lexique pour comprendre le sens aéronautique des variables extraites des `.json` du jeu.

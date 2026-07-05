@@ -1,3 +1,10 @@
+"""
+found_in_json.py - Script d'exploration ponctuel (TESTING_HALL, non utilisé en production).
+
+Cherche, parmi tous les .json d'avions d'un dossier, ceux qui contiennent un mot-clé
+donné (ex : identifier quels avions utilisent la clé "MinimalSpeed" plutôt que
+"stallSpeed"). Utile pour déboguer les extractions de extract_function.py.
+"""
 import os
 import json
 
