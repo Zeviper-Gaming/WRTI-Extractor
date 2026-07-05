@@ -4,11 +4,12 @@
 
 WRTI-Extractor génère automatiquement les fichiers de configuration (`.cfg`) du HUD **WTRTI** pour *War Thunder*, un affichage tête haute qui montre en jeu les vitesses et repères critiques de chaque avion (décrochage, volets, train, survitesse moteur, etc.).
 
-Sans cet outil, chaque profil `.cfg` devrait être écrit et calculé à la main, avion par avion. Le programme automatise ça en 3 étapes :
+Sans cet outil, chaque profil `.cfg` devrait être écrit et calculé à la main, avion par avion. Le programme automatise ça en 4 étapes :
 
 1. il récupère les données de vol brutes de chaque avion directement depuis les fichiers du jeu,
-2. il en extrait et calcule les valeurs utiles (vitesses critiques, puissance moteur, altitudes de compresseur, etc.),
-3. il génère un fichier `.cfg` par avion en remplaçant les bonnes valeurs dans un modèle générique.
+2. il en extrait et calcule les valeurs utiles (vitesses critiques, puissance moteur, altitudes de changement d'étage de compresseur, etc.),
+3. il génère un fichier `.cfg` par avion en remplaçant les bonnes valeurs dans un modèle générique,
+4. il copie automatiquement les `.cfg` générés vers le dossier de profils de WTRTI.
 
 ## Vue d'ensemble du pipeline
 
@@ -26,12 +27,15 @@ extracted_aircraft_data.csv   (données calculées : vitesses, RPM, Mach, etc.)
 generate_cfg_files() + import_data_from_dict() + import_data_from_extracted_data()
         │  (function.py)
         ▼
-Un fichier .cfg par avion, prêt à copier dans War Thunder
+Un fichier .cfg par avion
+        │  sync_cfg_to_wtrti()  (function.py)
+        ▼
+Dossier de profils WTRTI (copie automatique, avec backup)
 ```
 
 Les deux fichiers CSV ont des rôles différents et complémentaires :
 - **`fm_data_db.csv`** : données que tu renseignes toi-même (nom du profil, longueur, masse, volets, etc.) — c'est lui qui définit la liste des avions à traiter.
-- **`extracted_aircraft_data.csv`** : données calculées automatiquement à partir des fichiers `.json` du jeu (vitesses effectives, RPM, Mach critique...).
+- **`extracted_aircraft_data.csv`** : données calculées automatiquement à partir des fichiers `.json` du jeu (vitesses effectives, RPM, Mach critique, et pour chaque étage de compresseur : `CompressorAlt{i}`, `CompressorPower{i}`, `CompressorCeiling{i}`, `CompressorPowerAtCeiling{i}`).
 
 ## Arborescence du projet
 
@@ -44,7 +48,7 @@ WRTI-Extractor/
 ├── src/
 │   ├── function.py                # toutes les fonctions du pipeline cfg (cœur du programme)
 │   ├── generate_cfg_files.py      # variante autonome de main.py (étapes B du workflow)
-│   ├── replace_cfg_files.py       # copie les .cfg générés vers le dossier de War Thunder (INACHEVÉ, voir Notes)
+│   ├── replace_cfg_files.py       # copie les .cfg générés vers le dossier de profils WTRTI (aperçu par défaut, --apply pour appliquer)
 │   └── update_from_WTRTI.py       # récupère la dernière version de fm_data_db.csv depuis WTRTI
 │
 ├── extract_scripts/
@@ -73,13 +77,17 @@ WRTI-Extractor/
 
 ## Ordre d'utilisation
 
-Le point d'entrée est **`main.py`**. Il fonctionne avec 3 interrupteurs (constantes booléennes en haut du fichier) qu'on active selon ce qu'on veut faire :
+Le point d'entrée est **`main.py`**. Il fonctionne avec des interrupteurs (constantes booléennes en haut du fichier) qu'on active selon ce qu'on veut faire :
 
 ```py
 UPDATE_WTRTI_DATA        = False   # récupérer la dernière version de fm_data_db.csv depuis WTRTI
-GENERATE_CFG_FILES       = False   # créer un .cfg vierge pour chaque avion (à partir du modèle)
+GENERATE_CFG_FILES       = True    # créer un .cfg pour chaque nouvel avion (sans écraser les existants)
 REPLACE_VARIABLES_IN_CFG = True    # calculer et écrire les valeurs dans les .cfg existants
+SYNC_CFG_TO_WTRTI        = False   # copier les .cfg générés vers le dossier de profils WTRTI
+SYNC_DRY_RUN             = True    # aperçu sans rien modifier (False = applique réellement la copie)
 ```
+
+`GENERATE_CFG_FILES` ne crée que les `.cfg` **manquants** (nouveaux avions ajoutés au jeu) et n'écrase jamais un `.cfg` déjà rempli : il peut donc rester activé en permanence sans risque.
 
 ### Étape 1 — Mettre à jour les données brutes (si les caractéristiques des avions ont changé dans WTRTI)
 
@@ -104,7 +112,7 @@ GENERATE_CFG_FILES       = True
 REPLACE_VARIABLES_IN_CFG = False
 ```
 
-Cela copie `datas/0-custom.cfg` vers `datas/cfg_files/<nom_avion>.cfg` pour chaque avion listé dans `fm_data_db.csv`.
+Cela copie `datas/0-custom.cfg` vers `datas/cfg_files/<nom_avion>.cfg` pour chaque avion listé dans `extracted_aircraft_data.csv` qui n'a **pas encore** de `.cfg` (les avions déjà générés ne sont jamais écrasés). Utile après l'ajout de nouveaux avions au jeu.
 (Équivalent autonome : `python src/generate_cfg_files.py`.)
 
 ### Étape 3 — Calculer et écrire les valeurs dans les `.cfg`
@@ -116,6 +124,16 @@ REPLACE_VARIABLES_IN_CFG = True
 ```
 
 C'est l'étape qui fait le vrai travail : elle lit `fm_data_db.csv` et `extracted_aircraft_data.csv`, calcule les seuils (vitesses volets, RPM, puissance moteur, altitudes...) et remplace les variables correspondantes (`Vc`, `Vd`, `Power100`, `Alt11`...) directement dans le texte de chaque `.cfg`.
+
+#### Altitudes de changement d'étage de compresseur (`Alt11`/`Alt12`/`Alt21`/`Alt22`/`Alt31`/`Alt32`/`Altmax`)
+
+Ces bornes ne sont plus une marge fixe arbitraire (+/-20%/500m) autour de l'altitude nominale de chaque étage. Elles sont maintenant calculées à partir des vraies données de chaque avion (fonctions `compressor_switch_altitudes()` et consorts dans `src/function.py`) :
+
+1. chaque étage de compresseur donne 2 points réels dans les fichiers du jeu : `(Altitude{i}, Power{i})` (régime nominal) et `(Ceiling{i}, PowerAtCeiling{i})` (un second point plus haut, où la puissance a décru) ;
+2. on reconstruit une courbe puissance/altitude par étage, calée sur ces points via l'atmosphère standard (ISA) ;
+3. on cherche numériquement l'altitude où les courbes de deux étages consécutifs se croisent : c'est l'altitude de changement d'étage. Les zones adjacentes se touchent exactement à ce point (fini le trou entre deux étages).
+
+**Important** : ce n'est **pas** une reproduction exacte de la formule interne de Gaijin (bien plus complexe : zones de régulation/throttle, paliers "ConstRPM", WEP...), mais une approximation physique construite à partir des vraies données de chaque avion — donc nettement plus fiable que l'ancienne approximation à coefficients fixes. Validée sur quelques avions connus (P-51D, Spitfire IX, Yak-3, Fw 190A-5) contre les altitudes de changement d'étage historiques/communautaires, avec un bon accord.
 
 ### Étape 4 — Installer les profils dans War Thunder (automatique)
 
