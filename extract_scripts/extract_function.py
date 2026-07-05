@@ -10,7 +10,17 @@ variations de structure JSON selon les avions/versions du jeu (clés "EngineType
 """
 import json
 import os
-from MyPack2.Utilities import truncDecimal
+
+def round_to_unit(value, decimals=0):
+    """
+    Troncature/arrondi fiable, en remplacement de MyPack2.Utilities.truncDecimal (qui ne
+    tronquait pas correctement les valeurs à nombreuses décimales, ex: 1455.3680080282675
+    restait inchangé). Basé sur le round() natif de Python.
+    """
+    if value in (None, "None"):
+        return value
+    value = round(float(value), decimals)
+    return int(value) if decimals == 0 else value
 
 
 def extract_stallSpeed(json_data,filename):
@@ -30,7 +40,7 @@ def extract_stallSpeed(json_data,filename):
         elif "MinimalSpeed" in json_data:
             stall_speed = json_data["MinimalSpeed"]
 
-        return truncDecimal(stall_speed, 0)
+        return round_to_unit(stall_speed, 0)
     except Exception as e:
         print(f"Erreur lors de l'extraction de la stallSpeed: {e}")
         return None
@@ -46,6 +56,30 @@ def extract_effectiveSpeed(json_data, filename):
     Returns:
         dict: Contient les vitesses effectives extraites avec un arrondi.
     """
+    def most_conservative_value(raw):
+        """
+        Certains avions (ex: F-14, F-111 à géométrie variable, Jaguar) donnent une LISTE de
+        vitesses effectives (une par configuration : angle de flèche, volets, etc.) au lieu
+        d'une valeur unique. L'ancien code prenait toujours le premier élément de la liste,
+        ce qui est arbitraire et peut être anti-conservateur : sur le db_lk par exemple,
+        ElevatorsEffectiveSpeed valait [350.0, 450.0] et le code affichait "efficace à partir
+        de 350 km/h" alors qu'une des deux configurations ne l'est en réalité qu'à partir de
+        450 km/h (info silencieusement perdue).
+
+        On prend donc systématiquement la valeur la PLUS ÉLEVÉE parmi toutes celles trouvées
+        (aplatissement des listes/listes de listes) : c'est la borne la plus sûre pour un
+        seuil d'alerte HUD (on ne veut jamais indiquer un contrôle "efficace" plus tôt que
+        dans le pire des cas réels).
+        """
+        def flatten(x):
+            if isinstance(x, list):
+                for item in x:
+                    yield from flatten(item)
+            else:
+                yield x
+        values = [v for v in flatten(raw) if isinstance(v, (int, float))]
+        return max(values) if values else raw
+
     try:
         AileronEffectiveSpeed = 0
         RudderEffectiveSpeed = 0
@@ -53,37 +87,20 @@ def extract_effectiveSpeed(json_data, filename):
 
         # Extraction de AileronEffectiveSpeed
         if "AileronEffectiveSpeed" in json_data:
-            try:
-                AileronEffectiveSpeed = json_data["AileronEffectiveSpeed"][0]
-            except:
-                AileronEffectiveSpeed = json_data["AileronEffectiveSpeed"]
+            AileronEffectiveSpeed = most_conservative_value(json_data["AileronEffectiveSpeed"])
 
         # Extraction de RudderEffectiveSpeed
         if "RudderEffectiveSpeed" in json_data:
-            try:
-                RudderEffectiveSpeed = json_data["RudderEffectiveSpeed"][0]
-            except:
-                RudderEffectiveSpeed = json_data["RudderEffectiveSpeed"]
+            RudderEffectiveSpeed = most_conservative_value(json_data["RudderEffectiveSpeed"])
 
         # Extraction de ElevatorsEffectiveSpeed
         if "ElevatorsEffectiveSpeed" in json_data:
-            elevators_data = json_data["ElevatorsEffectiveSpeed"]
-
-            if isinstance(elevators_data, list):
-                if isinstance(elevators_data[0], list):
-                    # Cas : liste de listes
-                    ElevatorsEffectiveSpeed = elevators_data[0][0]
-                else:
-                    # Cas : liste simple
-                    ElevatorsEffectiveSpeed = elevators_data[0]
-            else:
-                # Cas : valeur unique
-                ElevatorsEffectiveSpeed = elevators_data
+            ElevatorsEffectiveSpeed = most_conservative_value(json_data["ElevatorsEffectiveSpeed"])
 
         return {
-            "AileronEffectiveSpeed": truncDecimal(AileronEffectiveSpeed, 0),
-            "RudderEffectiveSpeed": truncDecimal(RudderEffectiveSpeed, 0),
-            "ElevatorsEffectiveSpeed": truncDecimal(ElevatorsEffectiveSpeed, 0)
+            "AileronEffectiveSpeed": round_to_unit(AileronEffectiveSpeed, 0),
+            "RudderEffectiveSpeed": round_to_unit(RudderEffectiveSpeed, 0),
+            "ElevatorsEffectiveSpeed": round_to_unit(ElevatorsEffectiveSpeed, 0)
         }
     except Exception as e:
         # print(f"Erreur lors de l'extraction des vitesses effectives dans {filename}: {e}")

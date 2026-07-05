@@ -16,9 +16,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import make_interp_spline
 from MyPack2.Myos import TERMINAL
-from MyPack2.Utilities import truncDecimal
 
 DEBUG = False
+
+def round_to_unit(value, decimals=0):
+   """
+   Troncature/arrondi fiable, en remplacement de MyPack2.Utilities.truncDecimal : ce dernier
+   ne tronquait pas correctement les valeurs à nombreuses décimales (ex: 1455.3680080282675
+   restait inchangé dans les .cfg générés). Basé sur le round() natif de Python.
+   """
+   if value in (None, "None"):
+      return value
+   value = round(float(value), decimals)
+   return int(value) if decimals == 0 else value
 
 def goto_root():
    if TERMINAL == "PC": pass
@@ -117,14 +127,14 @@ def import_data_from_dict(data_dico):
       dico_variable = {
          "Fc"     : str(Fc),
          "Fd"     : str(Fd),
-         "Vc"     : str(truncDecimal(Vc, 0)),
-         "Va"     : str(truncDecimal(Va, 0)),
-         "Vg_red" : str(truncDecimal(Vg_red, 0)),
-         "Vg"     : str(truncDecimal(Vg, 0)),
-         "Vd"     : str(truncDecimal(Vd, 0)),
-         "rpm_1"  : str(truncDecimal(rpm_1, 0)),
-         "rpm_2"  : str(truncDecimal(rpm_2, 0)),
-         "rpm_3"  : str(truncDecimal(rpm_3, 0)),
+         "Vc"     : str(round_to_unit(Vc, 0)),
+         "Va"     : str(round_to_unit(Va, 0)),
+         "Vg_red" : str(round_to_unit(Vg_red, 0)),
+         "Vg"     : str(round_to_unit(Vg, 0)),
+         "Vd"     : str(round_to_unit(Vd, 0)),
+         "rpm_1"  : str(round_to_unit(rpm_1, 0)),
+         "rpm_2"  : str(round_to_unit(rpm_2, 0)),
+         "rpm_3"  : str(round_to_unit(rpm_3, 0)),
       }
       if TERMINAL == "PC": os.chdir(r"F:\Github Local\WRTI-Extractor\datas\cfg_files")
       if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files")
@@ -310,17 +320,26 @@ def import_data_from_extracted_data(data_dico):
       EffectiveSpeed = [data_dico["AileronEffectiveSpeed"][i],
                         data_dico["RudderEffectiveSpeed"][i],
                         data_dico["ElevatorsEffectiveSpeed"][i]]
-      Vred  = truncDecimal(data_dico["stallSpeed"][i],0) # Vitesse de décrochage
+      Vred  = round_to_unit(data_dico["stallSpeed"][i],0) # Vitesse de décrochage
       if Vred != "None":
           Vlow  = Vred + 50
       else:
           Vlow = "None" # Warning décrochage
-      V1    = truncDecimal(min(EffectiveSpeed),0) # Seuil vitesse efficace bas
-      V2    = truncDecimal(max(EffectiveSpeed),0) # Seuil vitesse efficace haut
+      # V1 = vitesse a partir de laquelle le PREMIER des 3 controles (ailerons/gouvernail/
+      # profondeur) devient pleinement efficace ; V2 = vitesse a partir de laquelle les
+      # TROIS le sont (cf. json_info.md : chaque XxxEffectiveSpeed est un seuil bas, "vitesse
+      # minimale a partir de laquelle ce controle devient pleinement operationnel"). Verifie
+      # sur les 829 avions : cette semantique min/max est correcte, mais l'ecart entre les 3
+      # seuils peut etre tres important sur les avions a reaction (jusqu'a plusieurs centaines
+      # de km/h, ex: F-8E Aileron=1000/Rudder=590/Elevators=500) - le fichier .cfg ne portant
+      # que 2 bornes (V1/V2), le seuil intermediaire n'est pas affichable sans modifier le
+      # template 0-custom.cfg (hors scope ici, a la demande de Florian).
+      V1    = round_to_unit(min(EffectiveSpeed),0) # Seuil vitesse efficace bas
+      V2    = round_to_unit(max(EffectiveSpeed),0) # Seuil vitesse efficace haut
       # MachCrit reste a 2 decimales (pas a l'unite) : ce sont des ratios entre 0 et ~2, une
       # troncature a l'unite les rendrait inutilisables (0.55 -> 0/1).
-      MachCrit1 = truncDecimal(data_dico["MachCritic1"][i], 2) # Mach Critique
-      MachCrit2 = truncDecimal(data_dico["MachCritic2"][i], 2) # Mach Critique
+      MachCrit1 = round_to_unit(data_dico["MachCritic1"][i], 2) # Mach Critique
+      MachCrit2 = round_to_unit(data_dico["MachCritic2"][i], 2) # Mach Critique
       # Altitude - altitudes de changement d'étage de compresseur, calculées à partir des vraies
       # courbes de puissance de chaque étage (cf. section "Modélisation physique du compresseur"
       # plus haut dans ce fichier), plutôt que par une marge fixe +/-20%/500m autour de l'altitude
@@ -334,25 +353,25 @@ def import_data_from_extracted_data(data_dico):
       # Troncature à l'unité (mètre) : les altitudes de croisement sont issues d'une recherche
       # numérique (dichotomie) et contiennent sinon de nombreuses décimales de bruit
       # (ex: "1455.3680080282675").
-      Alt11 = truncDecimal(Alt11, 0)
-      Alt12 = truncDecimal(Alt12, 0)
-      Alt21 = truncDecimal(Alt21, 0)
-      Alt22 = truncDecimal(Alt22, 0)
-      Alt31 = truncDecimal(Alt31, 0)
-      Alt32 = truncDecimal(Alt32, 0)
-      Altmax = truncDecimal(Altmax, 0)
+      Alt11 = round_to_unit(Alt11, 0)
+      Alt12 = round_to_unit(Alt12, 0)
+      Alt21 = round_to_unit(Alt21, 0)
+      Alt22 = round_to_unit(Alt22, 0)
+      Alt31 = round_to_unit(Alt31, 0)
+      Alt32 = round_to_unit(Alt32, 0)
+      Altmax = round_to_unit(Altmax, 0)
       # Engine power - tronqué à l'unité près (ch), puis les paliers dérivés du même Power100 déjà arrondi
-      Power100 = truncDecimal(data_dico["EnginePower"][i], 0)
-      Power105 = truncDecimal(1.05*Power100, 0)
-      Power110 = truncDecimal(1.10*Power100, 0)
-      Power095 = truncDecimal(0.95*Power100, 0)
-      Power085 = truncDecimal(0.85*Power100, 0)
-      Power070 = truncDecimal(0.70*Power100, 0)
-      Power050 = truncDecimal(0.50*Power100, 0)
+      Power100 = round_to_unit(data_dico["EnginePower"][i], 0)
+      Power105 = round_to_unit(1.05*Power100, 0)
+      Power110 = round_to_unit(1.10*Power100, 0)
+      Power095 = round_to_unit(0.95*Power100, 0)
+      Power085 = round_to_unit(0.85*Power100, 0)
+      Power070 = round_to_unit(0.70*Power100, 0)
+      Power050 = round_to_unit(0.50*Power100, 0)
       # Cooling Air speed
-      CoolingSpeed = truncDecimal(data_dico["CoolingEffectiveAirSpeed"][i], 0)
-      OilT = truncDecimal(data_dico["OilBoilingTemperature"][i], 0)
-      WaterT = truncDecimal(data_dico["WaterBoilingTemperature"][i], 0)
+      CoolingSpeed = round_to_unit(data_dico["CoolingEffectiveAirSpeed"][i], 0)
+      OilT = round_to_unit(data_dico["OilBoilingTemperature"][i], 0)
+      WaterT = round_to_unit(data_dico["WaterBoilingTemperature"][i], 0)
 
       dico_variable = {
         "Vred"   : str(Vred),
@@ -613,4 +632,3 @@ if __name__ == "__main__":
     json_file_path = "path_to_your_json_file.json"  # Remplacer par le chemin de votre fichier JSON
     compressor_data = extract_compressor_data(json_file_path)
     plot_compressor_graph(compressor_data)
-
