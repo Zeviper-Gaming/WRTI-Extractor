@@ -1,61 +1,140 @@
-# Template d'utilisations
-## Regénérer les configs files
-### From Windows
-Dans le terminal python
-```py
-import os
-os.chdir("F:\Github Local\WRTI-Extractor")
-run generate_cfg_files.py
+# WRTI-Extractor
+
+## À quoi sert ce projet
+
+WRTI-Extractor génère automatiquement les fichiers de configuration (`.cfg`) du HUD **WTRTI** pour *War Thunder*, un affichage tête haute qui montre en jeu les vitesses et repères critiques de chaque avion (décrochage, volets, train, survitesse moteur, etc.).
+
+Sans cet outil, chaque profil `.cfg` devrait être écrit et calculé à la main, avion par avion. Le programme automatise ça en 3 étapes :
+
+1. il récupère les données de vol brutes de chaque avion directement depuis les fichiers du jeu,
+2. il en extrait et calcule les valeurs utiles (vitesses critiques, puissance moteur, altitudes de compresseur, etc.),
+3. il génère un fichier `.cfg` par avion en remplaçant les bonnes valeurs dans un modèle générique.
+
+## Vue d'ensemble du pipeline
+
 ```
-Pour copier coller les cfg dans le dossier de WTRTI
-```py
-run replace_cfg_files
+Fichiers du jeu (.blkx)
+        │  blk2json.py
+        ▼
+Fichiers .json (un par avion)
+        │  extract_json_data.py + extract_function.py
+        ▼
+extracted_aircraft_data.csv   (données calculées : vitesses, RPM, Mach, etc.)
+        │
+        │   +  fm_data_db.csv   (données géométriques/masse saisies à la main)
+        ▼
+generate_cfg_files() + import_data_from_dict() + import_data_from_extracted_data()
+        │  (function.py)
+        ▼
+Un fichier .cfg par avion, prêt à copier dans War Thunder
 ```
-### From MAC OS
+
+Les deux fichiers CSV ont des rôles différents et complémentaires :
+- **`fm_data_db.csv`** : données que tu renseignes toi-même (nom du profil, longueur, masse, volets, etc.) — c'est lui qui définit la liste des avions à traiter.
+- **`extracted_aircraft_data.csv`** : données calculées automatiquement à partir des fichiers `.json` du jeu (vitesses effectives, RPM, Mach critique...).
+
+## Arborescence du projet
+
+```
+WRTI-Extractor/
+├── main.py                        # script pilote principal (à lancer en premier)
+├── ReadMe.md
+├── json_info.md                   # lexique des variables techniques des avions (aéro)
+│
+├── src/
+│   ├── function.py                # toutes les fonctions du pipeline cfg (cœur du programme)
+│   ├── generate_cfg_files.py      # variante autonome de main.py (étapes B du workflow)
+│   ├── replace_cfg_files.py       # copie les .cfg générés vers le dossier de War Thunder (INACHEVÉ, voir Notes)
+│   └── update_from_WTRTI.py       # récupère la dernière version de fm_data_db.csv depuis WTRTI
+│
+├── extract_scripts/
+│   ├── blk2json.py                 # renomme les .blkx du jeu en .json
+│   ├── extract_json_data.py        # parcourt les .json et construit extracted_aircraft_data.csv
+│   └── extract_function.py         # fonctions d'extraction utilisées par extract_json_data.py
+│
+├── datas/
+│   ├── fm_data_db.csv               # liste des avions + données géométriques (source manuelle)
+│   ├── fm_data_db - Copie.csv        # sauvegarde de secours du fichier ci-dessus
+│   ├── extracted_aircraft_data.csv   # données extraites/calculées automatiquement des .json
+│   ├── 0-custom.cfg                  # modèle générique de .cfg (avec variables à remplacer)
+│   ├── fm_blk_files/                 # fichiers .blkx bruts copiés depuis War Thunder
+│   ├── json_files/                   # copie des .blkx renommés en .json (entrée de l'extraction)
+│   └── cfg_files/                    # .cfg générés, un par avion (sortie finale du programme)
+│
+└── TESTING_HALL/                  # scripts d'essai / debug ponctuels, pas utilisés en prod
+```
+
+## Prérequis
+
+- **Python 3**
+- **MyPack2** : ta bibliothèque personnelle (modules `Saves.CSV`, `Myos`, `Utilities`). Elle doit être installée / accessible dans le `PYTHONPATH` sur la machine utilisée — le projet ne fonctionne pas sans elle.
+- `numpy`, `scipy`, `matplotlib` (utilisés uniquement par la fonction de debug du compresseur dans `function.py`, facultatif pour la génération des cfg).
+- Le dossier du jeu où se trouvent les fichiers WTRTI (`fm_data_db.csv`, dossier des `.blkx`).
+
+## Ordre d'utilisation
+
+Le point d'entrée est **`main.py`**. Il fonctionne avec 3 interrupteurs (constantes booléennes en haut du fichier) qu'on active selon ce qu'on veut faire :
+
+```py
+UPDATE_WTRTI_DATA        = False   # récupérer la dernière version de fm_data_db.csv depuis WTRTI
+GENERATE_CFG_FILES       = False   # créer un .cfg vierge pour chaque avion (à partir du modèle)
+REPLACE_VARIABLES_IN_CFG = True    # calculer et écrire les valeurs dans les .cfg existants
+```
+
+### Étape 1 — Mettre à jour les données brutes (si les caractéristiques des avions ont changé dans WTRTI)
+
+```py
+UPDATE_WTRTI_DATA        = True
+GENERATE_CFG_FILES       = False
+REPLACE_VARIABLES_IN_CFG = False
+```
+
+Ensuite, si de nouveaux fichiers `.blkx` ont été ajoutés côté jeu, lancer :
+
 ```bash
-cd /Users/florian/Github Local/WRTI-Extractor
-python3 generate_cfg_files.py
+python extract_scripts/blk2json.py        # renomme les .blkx en .json
+python extract_scripts/extract_json_data.py   # reconstruit extracted_aircraft_data.csv
 ```
-## Ajouter un nouveau profil
 
+### Étape 2 — Générer un `.cfg` vierge pour chaque nouvel avion
 
-# Composition du programme
-### `Function.py`
-- Comporte l'ensemble des foonctions appelés par le programme
-### `main.py`
-- Fichier pilote principal.
-### generate_cfg_files
-Ce programme permet de regénérer les fichiers cfg pour chaques avions a partir des données du fichier "fm_data_db.csv"
-contenue dans le dossier "config_files" de ce programme.
-Il remplace l'utilsation du programme "main.py" avec les paramètres décris dans la situation B du readme.
-### config_files
-- Dossier regroupant les fichiers permettant de générer les `cfg` pour chaques avions.
-- `fm_data_db.csv` fichier utilisé afin de récuprérer les données utiles pour faire les calculs et générer les `cfg` de chaques avions.
-    ATTENTION !! Certains lignes ont été ajoutés dans ce fichier afin de générer des profiles pour des avions qui n'en n'avait pas de base. Ces  profiles ne sont pas présent dans le backups de ce fichier.
-- `fm_data_db.csv - Copie` backups de secours 
-- Les fichiers `db_7.cfg` et `vg_33.cfg` ne sont pas indispensable mais permette de faire une sauvegarde de ces `cfg`afin d'avoir un profile spécifique pour ces avions
-### data
--Regroupe l'ensemble des fichiers `cfg` pour chaques avions du jeu. Chaques fichier correspond a une ligne du fichier `fm_data_db.csv`. Les noms des fichiers `cfg` sont ceux de la colonne `Name`.
-
-
-# Fonctionnement du programme.
-## A - Mise a jour des données de WTRTI
-Pour cela, run le fichier `main.py` avec les paramètres suivants:
 ```py
-# Constante
-IS_UPDATE = True
-UPDATE_CFG_FILES = False
+UPDATE_WTRTI_DATA        = False
+GENERATE_CFG_FILES       = True
+REPLACE_VARIABLES_IN_CFG = False
 ```
 
-## B - Pour regénérer les fichiers `cfg` de chaques avions
-Dans ce cas, il suffit de run le fichier `main.py` avec les paramètres suivants:
+Cela copie `datas/0-custom.cfg` vers `datas/cfg_files/<nom_avion>.cfg` pour chaque avion listé dans `fm_data_db.csv`.
+(Équivalent autonome : `python src/generate_cfg_files.py`.)
+
+### Étape 3 — Calculer et écrire les valeurs dans les `.cfg`
+
 ```py
-# Constante
-IS_UPDATE = False 
-UPDATE_CFG_FILES = True
+UPDATE_WTRTI_DATA        = False
+GENERATE_CFG_FILES       = False
+REPLACE_VARIABLES_IN_CFG = True
 ```
-Une fois ces fichiers `cfg` regénérés, il suffit de copier-coller les fichiers du dossier "data" dans `D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\Profiles`
 
-## C - Ajouter des nouveaux profiles d'avions
-Pour cela, il faut générer une nouvelle ligne dans le fichier `fm_data_db.csv` comportant le nom du profile (ce nom doit etre celui du profil d'avion de War Thunder)
-Il convient ensuite de trouver et modifier les caractéristiques de ce profile dans ce fichier afin qu'il corresponde.
+C'est l'étape qui fait le vrai travail : elle lit `fm_data_db.csv` et `extracted_aircraft_data.csv`, calcule les seuils (vitesses volets, RPM, puissance moteur, altitudes...) et remplace les variables correspondantes (`Vc`, `Vd`, `Power100`, `Alt11`...) directement dans le texte de chaque `.cfg`.
+
+### Étape 4 — Installer les profils dans War Thunder
+
+Une fois les `.cfg` régénérés dans `datas/cfg_files/`, il suffit de les copier-coller dans le dossier de profils de WTRTI, par exemple :
+
+```
+D:\OneDrive\Logiciels et Jeux\War Thunder\HUDs\Profiles
+```
+
+## Ajouter un nouvel avion
+
+1. Ajouter une ligne dans `datas/fm_data_db.csv` avec le nom exact du profil War Thunder (colonne `Name`) et ses caractéristiques (longueur, masse, volets, etc.).
+2. Relancer l'étape 2 (génération du `.cfg` vierge) puis l'étape 3 (calcul des valeurs) pour cet avion.
+3. Copier le nouveau `.cfg` dans le dossier de profils WTRTI (étape 4).
+
+## Points d'attention
+
+- Les chemins de dossiers sont actuellement écrits en dur dans le code (`F:\Github Local\WRTI-Extractor`, `/Users/florian/...`, `D:\OneDrive\...`) et adaptés au cas par cas via `MyPack2.Myos.TERMINAL` (`"PC"` ou `"MAC"`). Vérifier ces chemins si l'arborescence change.
+- `src/replace_cfg_files.py` est marqué comme inachevé dans le code (peur d'écraser des profils WTRTI existants) — à ne pas utiliser tel quel sans relecture.
+- Le champ `AirbrakeDestructionIndSpeed` extrait des `.json` est presque toujours `None` ou `-1` et n'est pas encore exploité.
+- `datas/fm_data_db.csv` contient des lignes ajoutées à la main pour des avions sans profil de base ; ces lignes ne sont pas présentes dans `fm_data_db - Copie.csv` (backup).
+- `json_info.md` sert de lexique pour comprendre le sens aéronautique des variables extraites des `.json` du jeu.
