@@ -46,15 +46,19 @@ def update_wtrti_data():
          line = line.replace(";",",")
          new_data_file.write(line)
 
-def generate_cfg_files(data_dico, overwrite_existing=False):
+def generate_cfg_files(data_dico, overwrite_existing=True):
    '''
    Fait une copie du fichier 0-custom.cfg pour chaques avions enregistrés dans "fm_data_db.csv"
    :0-custom.cfg:   Fichier cfg dans lequel on retrouve toutes les variables qui seront remplacé par ce programme par
                   les valeurs correctes pour chaques avions.
    :param data_dico:
-   :param overwrite_existing: False par défaut -> ne crée que les .cfg manquants (backfill), sans
-          écraser ceux déjà présents (donc déjà calculés). Mettre True pour tout régénérer depuis
-          zéro (nécessite de relancer ensuite REPLACE_VARIABLES_IN_CFG pour tout remplir à nouveau).
+   :param overwrite_existing: True par défaut -> régénère TOUS les .cfg à partir du modèle vierge,
+          y compris ceux qui existent déjà. Nécessaire pour mettre à jour les valeurs : une fois
+          substituées, les variables ("Vc", "Alt11"...) n'existent plus dans le texte du .cfg, donc
+          repartir du modèle vierge à chaque fois est indispensable avant de rappeler
+          REPLACE_VARIABLES_IN_CFG (ce que fait déjà main.py, à la suite). Mettre False pour ne
+          créer que les .cfg manquants sans toucher aux autres (utile pour un simple backfill
+          ponctuel, sans vouloir recalculer les avions déjà générés).
    :return:
    '''
    filename = "0-custom.cfg"

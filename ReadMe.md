@@ -81,13 +81,13 @@ Le point d'entrée est **`main.py`**. Il fonctionne avec des interrupteurs (cons
 
 ```py
 UPDATE_WTRTI_DATA        = False   # récupérer la dernière version de fm_data_db.csv depuis WTRTI
-GENERATE_CFG_FILES       = True    # créer un .cfg pour chaque nouvel avion (sans écraser les existants)
+GENERATE_CFG_FILES       = True    # régénérer TOUS les .cfg à partir du modèle vierge (0-custom.cfg)
 REPLACE_VARIABLES_IN_CFG = True    # calculer et écrire les valeurs dans les .cfg existants
 SYNC_CFG_TO_WTRTI        = False   # copier les .cfg générés vers le dossier de profils WTRTI
 SYNC_DRY_RUN             = True    # aperçu sans rien modifier (False = applique réellement la copie)
 ```
 
-`GENERATE_CFG_FILES` ne crée que les `.cfg` **manquants** (nouveaux avions ajoutés au jeu) et n'écrase jamais un `.cfg` déjà rempli : il peut donc rester activé en permanence sans risque.
+`GENERATE_CFG_FILES` régénère **tous** les `.cfg` à partir du modèle vierge (y compris ceux qui existent déjà), pas seulement les nouveaux avions. C'est nécessaire : une fois qu'un `.cfg` a été rempli, les variables (`Vc`, `Alt11`...) n'existent plus dans son texte (elles ont été remplacées par des valeurs), donc pour mettre à jour un avion avec des données fraîches il faut repartir du modèle vierge avant de relancer la substitution. `GENERATE_CFG_FILES` et `REPLACE_VARIABLES_IN_CFG` sont donc normalement activés **ensemble** (ce que fait `main.py` par défaut). Passer `func.generate_cfg_files(data_dico, overwrite_existing=False)` permet de ne créer que les `.cfg` manquants sans toucher aux autres, si besoin ponctuellement.
 
 ### Étape 1 — Mettre à jour les données brutes (si les caractéristiques des avions ont changé dans WTRTI)
 
@@ -104,7 +104,7 @@ python extract_scripts/blk2json.py        # renomme les .blkx en .json
 python extract_scripts/extract_json_data.py   # reconstruit extracted_aircraft_data.csv
 ```
 
-### Étape 2 — Générer un `.cfg` vierge pour chaque nouvel avion
+### Étape 2 — Régénérer un `.cfg` vierge pour chaque avion
 
 ```py
 UPDATE_WTRTI_DATA        = False
@@ -112,7 +112,7 @@ GENERATE_CFG_FILES       = True
 REPLACE_VARIABLES_IN_CFG = False
 ```
 
-Cela copie `datas/0-custom.cfg` vers `datas/cfg_files/<nom_avion>.cfg` pour chaque avion listé dans `extracted_aircraft_data.csv` qui n'a **pas encore** de `.cfg` (les avions déjà générés ne sont jamais écrasés). Utile après l'ajout de nouveaux avions au jeu.
+Cela copie `datas/0-custom.cfg` vers `datas/cfg_files/<nom_avion>.cfg` pour **tous** les avions listés dans `extracted_aircraft_data.csv`, en écrasant les `.cfg` déjà présents. C'est indispensable pour repartir d'un fichier "vierge" (variables intactes) avant de recalculer et réinjecter des valeurs à jour à l'étape suivante — dans la pratique, cette étape et l'étape 3 sont activées ensemble.
 (Équivalent autonome : `python src/generate_cfg_files.py`.)
 
 ### Étape 3 — Calculer et écrire les valeurs dans les `.cfg`
