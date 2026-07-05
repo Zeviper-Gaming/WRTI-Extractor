@@ -202,3 +202,42 @@ def extract_RPMLimits(json_data):
             continue
 
     return [rpm_1,rpm_2,rpm_3]
+
+def extract_compressorStagesData(json_data, filename):
+    """
+    Extrait, pour chaque étage de compresseur (jusqu'à 3, indices 0/1/2 comme dans les fichiers
+    du jeu), les points nécessaires pour reconstruire sa courbe de puissance en fonction de
+    l'altitude :
+    - Altitude{i} / Power{i}         : altitude et puissance au régime nominal de l'étage.
+    - Ceiling{i} / PowerAtCeiling{i} : un second point plus haut, où la puissance a décru.
+
+    Ces 4 valeurs par étage sont ensuite utilisées par
+    src/function.py::compressor_switch_altitudes() pour calculer l'altitude réelle de
+    changement d'étage (croisement des courbes de puissance de deux étages consécutifs).
+
+    Valeur par défaut 0 si l'étage ou le champ n'existe pas dans le fichier (mêmes conventions
+    que extract_compressorStage), pour rester compatible avec le format du CSV (colonnes de
+    taille fixe, alignées par avion).
+
+    Returns:
+        dict avec les clés "Altitude", "Power", "Ceiling", "PowerAtCeiling", chacune une liste
+        de 3 valeurs (une par étage, 0 si absent).
+    """
+    result = {"Altitude": [0, 0, 0], "Power": [0, 0, 0], "Ceiling": [0, 0, 0], "PowerAtCeiling": [0, 0, 0]}
+    try:
+        try:    CompressorData = json_data["EngineType0"]["Compressor"]
+        except: CompressorData = json_data["Engine0"]["Compressor"]
+    except:
+        print(f"Données de compresseur non trouvées pour: {filename}")
+        return result
+
+    for i in range(3):
+        if f"Altitude{i}" in CompressorData:
+            result["Altitude"][i] = CompressorData[f"Altitude{i}"]
+        if f"Power{i}" in CompressorData:
+            result["Power"][i] = CompressorData[f"Power{i}"]
+        if f"Ceiling{i}" in CompressorData:
+            result["Ceiling"][i] = CompressorData[f"Ceiling{i}"]
+        if f"PowerAtCeiling{i}" in CompressorData:
+            result["PowerAtCeiling"][i] = CompressorData[f"PowerAtCeiling{i}"]
+    return result

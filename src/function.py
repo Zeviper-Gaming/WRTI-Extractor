@@ -10,6 +10,7 @@ pipeline de génération des .cfg et utilisées ponctuellement depuis TESTING_HA
 import os
 import shutil
 import json
+import math
 from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
@@ -111,6 +112,176 @@ def import_data_from_dict(data_dico):
       if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files")
       rewrite_cfg_file(f"{name}.cfg",dico_variable)
 
+########################################################################################################################
+# Modélisation physique du compresseur : calcul de l'altitude réelle de changement d'étage
+########################################################################################################################
+# Idée : chaque étage de compresseur donne 2 points réels dans les fichiers du jeu :
+#   - (Altitude_i, Power_i)               -> régime nominal de l'étage
+#   - (Ceiling_i, PowerAtCeiling_i)        -> un second point plus haut, où la puissance a décru
+# On s'en sert pour reconstruire une courbe puissance(altitude) par étage (loi de puissance basée
+# sur le rapport de pression de l'atmosphère standard), puis on cherche numériquement l'altitude
+# où les courbes de deux étages consécutifs se croisent : c'est l'altitude de changement d'étage.
+#
+# ATTENTION : ce n'est PAS une reproduction exacte de la formule interne de Gaijin (bien plus
+# complexe : zones de régulation/throttle, paliers "ConstRPM", WEP...). C'est une approximation
+# physique construite à partir des vraies données de chaque avion (donc bien plus fiable que
+# l'ancienne approximation à base de coefficients fixes +/-20%/500m), mais qui reste une
+# approximation. Validée manuellement sur quelques avions (ex: P-51D, Spitfire IX) contre les
+# altitudes de changement d'étage historiques/communautaires connues, avec un bon accord.
+
+ISA_LAPSE_RATE = 0.0065        # gradient de température de l'atmosphère standard (K/m), jusqu'à 11 000 m
+ISA_SEA_LEVEL_TEMP = 288.15    # température au niveau de la mer (K), atmosphère standard
+ISA_TROPOPAUSE_ALT = 11000.0   # altitude de la tropopause (m), atmosphère standard
+ISA_PRESSURE_EXPONENT = 5.2561 # exposant de la formule barométrique (g*M/(R*L))
+ISA_STRATO_SCALE_HEIGHT = 6341.6  # hauteur d'échelle (m) pour la décroissance exponentielle au-dessus de la tropopause
+DEFAULT_DECAY_EXPONENT = 1.0   # exposant par défaut si le point "Ceiling" d'un étage est inutilisable
+
+def isa_pressure_ratio(altitude_m):
+   """
+   Rapport de pression de l'atmosphère standard (ISA) entre l'altitude donnée et le niveau de la
+   mer. Valable jusqu'à ~20 km (troposphère + début de stratosphère isotherme).
+   """
+   if altitude_m <= ISA_TROPOPAUSE_ALT:
+      return (1 - ISA_LAPSE_RATE * altitude_m / ISA_SEA_LEVEL_TEMP) ** ISA_PRESSURE_EXPONENT
+   ratio_tropopause = (1 - ISA_LAPSE_RATE * ISA_TROPOPAUSE_ALT / ISA_SEA_LEVEL_TEMP) ** ISA_PRESSURE_EXPONENT
+   return ratio_tropopause * math.exp(-(altitude_m - ISA_TROPOPAUSE_ALT) / ISA_STRATO_SCALE_HEIGHT)
+
+def is_valid_number(value):
+   """Vérifie qu'une valeur issue du CSV est un nombre exploitable (pas None/"None"/0 utilisé comme "absent")."""
+   if value in (None, "None", 0, "0"):
+      return False
+   try:
+      float(value)
+      return True
+   except (TypeError, ValueError):
+      return False
+
+def stage_decay_exponent(altitude_rated, power_rated, altitude_ceiling, power_ceiling):
+   """
+   Calcule l'exposant k de la loi de puissance P(h) = power_rated * (rho(h)/rho(altitude_rated))**k
+   à partir des deux points réels (altitude_rated, power_rated) et (altitude_ceiling, power_ceiling)
+   donnés dans les fichiers du jeu pour un étage de compresseur.
+
+   Retourne None si ces deux points ne permettent pas un calcul fiable (ex: "Ceiling" situé sous
+   "Altitude" -> il ne sert pas à décrire la décroissance de cet étage, cas fréquent pour un étage
+   qui n'est pas le dernier).
+   """
+   if not all(is_valid_number(v) for v in (altitude_rated, power_rated, altitude_ceiling, power_ceiling)):
+      return None
+   altitude_rated, power_rated = float(altitude_rated), float(power_rated)
+   altitude_ceiling, power_ceiling = float(altitude_ceiling), float(power_ceiling)
+   if altitude_ceiling <= altitude_rated or power_rated <= 0 or power_ceiling <= 0:
+      return None
+   ratio_pression = isa_pressure_ratio(altitude_ceiling) / isa_pressure_ratio(altitude_rated)
+   if ratio_pression <= 0 or abs(ratio_pression - 1) < 1e-9:
+      return None
+   return math.log(power_ceiling / power_rated) / math.log(ratio_pression)
+
+def stage_power_curve(altitude_rated, power_rated, exponent=None):
+   """
+   Retourne une fonction altitude -> puissance pour un étage de compresseur.
+   En-dessous de altitude_rated, on considère la puissance constante (régime régulé, approximation).
+   Au-dessus, la puissance décroît selon la loi de puissance basée sur le rapport de pression ISA.
+   """
+   altitude_rated, power_rated = float(altitude_rated), float(power_rated)
+   k = exponent if exponent is not None else DEFAULT_DECAY_EXPONENT
+   def power_at(altitude):
+      if altitude <= altitude_rated:
+         return power_rated
+      return power_rated * (isa_pressure_ratio(altitude) / isa_pressure_ratio(altitude_rated)) ** k
+   return power_at
+
+def build_stage_curve(altitude_rated, power_rated, altitude_ceiling, power_ceiling):
+   """Construit la courbe puissance(altitude) d'un étage, avec repli sur DEFAULT_DECAY_EXPONENT
+   si les données de "ceiling" de cet étage ne sont pas utilisables."""
+   exponent = stage_decay_exponent(altitude_rated, power_rated, altitude_ceiling, power_ceiling)
+   return stage_power_curve(altitude_rated, power_rated, exponent)
+
+def find_gearshift_altitude(power_curve_low, power_curve_high, search_min, search_max, step=50.0):
+   """
+   Cherche l'altitude à laquelle la puissance de l'étage supérieur (power_curve_high) dépasse celle
+   de l'étage actuel (power_curve_low), en balayant [search_min, search_max] par pas de "step"
+   mètres puis en affinant par dichotomie. Retourne None si aucun croisement n'est trouvé.
+   """
+   search_min, search_max = float(search_min), float(search_max)
+   altitude = search_min
+   prev_diff = power_curve_low(altitude) - power_curve_high(altitude)
+   while altitude <= search_max:
+      altitude += step
+      diff = power_curve_low(altitude) - power_curve_high(altitude)
+      if prev_diff >= 0 and diff < 0:
+         low, high = altitude - step, altitude
+         for _ in range(40):
+            mid = (low + high) / 2
+            if power_curve_low(mid) - power_curve_high(mid) >= 0:
+               low = mid
+            else:
+               high = mid
+         return (low + high) / 2
+      prev_diff = diff
+   return None
+
+def get_active_compressor_stages(stage_altitudes, stage_powers):
+   """Renvoie les indices des étages réellement présents (altitude et puissance renseignées)."""
+   return [i for i in range(len(stage_altitudes))
+           if is_valid_number(stage_altitudes[i]) and is_valid_number(stage_powers[i])]
+
+def compressor_switch_altitudes(stage_altitudes, stage_powers, stage_ceilings, stage_powers_at_ceiling,
+                                 floor_altitude=0.0, ceiling_margin=1000.0):
+   """
+   Calcule les altitudes de changement d'étage de compresseur (points de croisement des courbes de
+   puissance de deux étages consécutifs), pour 1 à 3 étages.
+
+   Les zones adjacentes se touchent exactement à l'altitude de changement d'étage (fini le "trou"
+   entre deux étages que produisait l'ancienne approximation +/-20%/500m).
+
+   :param stage_altitudes: liste de 3 valeurs [Altitude0, Altitude1, Altitude2] (0 si étage absent).
+   :param stage_powers: liste de 3 valeurs [Power0, Power1, Power2].
+   :param stage_ceilings: liste de 3 valeurs [Ceiling0, Ceiling1, Ceiling2].
+   :param stage_powers_at_ceiling: liste de 3 valeurs [PowerAtCeiling0, PowerAtCeiling1, PowerAtCeiling2].
+   :return: tuple (Alt11, Alt12, Alt21, Alt22, Alt31, Alt32, Altmax), complété par des 0 pour les
+            étages absents (même convention que l'ancien code).
+   """
+   active = get_active_compressor_stages(stage_altitudes, stage_powers)
+   if not active:
+      return (0, 0, 0, 0, 0, 0, 0)
+
+   curves = {i: build_stage_curve(stage_altitudes[i], stage_powers[i], stage_ceilings[i], stage_powers_at_ceiling[i])
+             for i in active}
+
+   bounds = []  # [bas, haut] par étage actif, dans l'ordre
+   for pos, stage_idx in enumerate(active):
+      low = floor_altitude if pos == 0 else None  # rempli ensuite avec le croisement precedent
+      if pos < len(active) - 1:
+         next_idx = active[pos + 1]
+         crossing = find_gearshift_altitude(curves[stage_idx], curves[next_idx],
+                                             search_min=float(stage_altitudes[stage_idx]),
+                                             search_max=float(stage_altitudes[next_idx]) + ceiling_margin)
+         if crossing is None:
+            # repli si les courbes ne se croisent pas dans l'intervalle (rare, cas limite) :
+            # milieu entre les deux altitudes nominales, comme approximation de secours.
+            crossing = 0.5 * (float(stage_altitudes[stage_idx]) + float(stage_altitudes[next_idx]))
+         high = crossing
+      else:
+         if is_valid_number(stage_ceilings[stage_idx]) and float(stage_ceilings[stage_idx]) > float(stage_altitudes[stage_idx]):
+            high = float(stage_ceilings[stage_idx])
+         else:
+            high = float(stage_altitudes[stage_idx]) + ceiling_margin
+      bounds.append([low, high])
+
+   # La borne haute de l'étage n devient la borne basse de l'étage n+1
+   for pos in range(1, len(bounds)):
+      bounds[pos][0] = bounds[pos - 1][1]
+
+   flat = []
+   for b in bounds:
+      flat.extend(b)
+   while len(flat) < 6:
+      flat.append(0)
+   Alt11, Alt12, Alt21, Alt22, Alt31, Alt32 = flat[:6]
+   Altmax = bounds[-1][1]
+   return (Alt11, Alt12, Alt21, Alt22, Alt31, Alt32, Altmax)
+
 def import_data_from_extracted_data(data_dico):
    for i, name in enumerate(data_dico["aircraft"]):
       if DEBUG: print(f"importing {name}...")
@@ -126,21 +297,16 @@ def import_data_from_extracted_data(data_dico):
       V2    = truncDecimal(max(EffectiveSpeed),0) # Seuil vitesse efficace haut
       MachCrit1 = data_dico["MachCritic1"][i] # Mach Critique
       MachCrit2 = data_dico["MachCritic2"][i] # Mach Critique
-      # Altitude
-      Alt11 = 0.8*data_dico["CompressorAlt0"][i] - 500
-      Alt12 = 1.2*data_dico["CompressorAlt0"][i] + 500
-      if data_dico["CompressorAlt1"][i] != 0:
-          Alt21 = 0.8*data_dico["CompressorAlt1"][i] - 500
-          Alt22 = 1.2*data_dico["CompressorAlt1"][i] + 500
-      else:
-          Alt21, Alt22 = 0 ,0
-      if data_dico["CompressorAlt2"][i] !=0:
-          Alt31 = 0.8*data_dico["CompressorAlt2"][i] - 500
-          Alt32 = 1.2*data_dico["CompressorAlt2"][i] + 500
-          Altmax = Alt32
-      else:
-          Alt31, Alt32 = 0 , 0
-          Altmax = max(Alt12,Alt22,Alt32)
+      # Altitude - altitudes de changement d'étage de compresseur, calculées à partir des vraies
+      # courbes de puissance de chaque étage (cf. section "Modélisation physique du compresseur"
+      # plus haut dans ce fichier), plutôt que par une marge fixe +/-20%/500m autour de l'altitude
+      # nominale de chaque étage.
+      stage_altitudes = [data_dico["CompressorAlt0"][i], data_dico["CompressorAlt1"][i], data_dico["CompressorAlt2"][i]]
+      stage_powers = [data_dico["CompressorPower0"][i], data_dico["CompressorPower1"][i], data_dico["CompressorPower2"][i]]
+      stage_ceilings = [data_dico["CompressorCeiling0"][i], data_dico["CompressorCeiling1"][i], data_dico["CompressorCeiling2"][i]]
+      stage_powers_at_ceiling = [data_dico["CompressorPowerAtCeiling0"][i], data_dico["CompressorPowerAtCeiling1"][i], data_dico["CompressorPowerAtCeiling2"][i]]
+      Alt11, Alt12, Alt21, Alt22, Alt31, Alt32, Altmax = compressor_switch_altitudes(
+          stage_altitudes, stage_powers, stage_ceilings, stage_powers_at_ceiling)
       # Engine power
       Power100 = data_dico["EnginePower"][i]
       Power105 = 1.05*Power100

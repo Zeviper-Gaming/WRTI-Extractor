@@ -36,6 +36,15 @@ extracted_data_dict = {
     "CompressorAlt0": [],
     "CompressorAlt1": [],
     "CompressorAlt2": [],
+    "CompressorPower0": [],
+    "CompressorPower1": [],
+    "CompressorPower2": [],
+    "CompressorCeiling0": [],
+    "CompressorCeiling1": [],
+    "CompressorCeiling2": [],
+    "CompressorPowerAtCeiling0": [],
+    "CompressorPowerAtCeiling1": [],
+    "CompressorPowerAtCeiling2": [],
     "EnginePower": [],
     "RPMMin": [],
     "RPMMax": [],
@@ -90,6 +99,20 @@ for filename in json_files:
     extracted_data_dict["CompressorAlt0"].append(extract_compressorStage(json_data,filename)[0])
     extracted_data_dict["CompressorAlt1"].append(extract_compressorStage(json_data,filename)[1])
     extracted_data_dict["CompressorAlt2"].append(extract_compressorStage(json_data,filename)[2])
+
+    # Extract des points complémentaires (puissance nominale + point "ceiling") nécessaires pour
+    # reconstruire les courbes de puissance de chaque étage et calculer l'altitude de changement
+    # d'étage dans src/function.py
+    compressor_stages = extract_compressorStagesData(json_data, filename)
+    extracted_data_dict["CompressorPower0"].append(compressor_stages["Power"][0])
+    extracted_data_dict["CompressorPower1"].append(compressor_stages["Power"][1])
+    extracted_data_dict["CompressorPower2"].append(compressor_stages["Power"][2])
+    extracted_data_dict["CompressorCeiling0"].append(compressor_stages["Ceiling"][0])
+    extracted_data_dict["CompressorCeiling1"].append(compressor_stages["Ceiling"][1])
+    extracted_data_dict["CompressorCeiling2"].append(compressor_stages["Ceiling"][2])
+    extracted_data_dict["CompressorPowerAtCeiling0"].append(compressor_stages["PowerAtCeiling"][0])
+    extracted_data_dict["CompressorPowerAtCeiling1"].append(compressor_stages["PowerAtCeiling"][1])
+    extracted_data_dict["CompressorPowerAtCeiling2"].append(compressor_stages["PowerAtCeiling"][2])
 
     # Extract RPM limits
     RPM_data = extract_RPMLimits(json_data)
