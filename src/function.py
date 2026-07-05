@@ -105,27 +105,26 @@ def import_data_from_dict(data_dico):
       if Vd == "None": Fd,Vd = (0,0)
       if Va == "None": Va = 0
       if Vg == "None": Vg = 0
-      Vg_red   = str(int(Vg)*0.8)
+      Vg_red   = int(Vg)*0.8
 
       # RPM warning #todo theses variables are not used (rpm_1,rpm_2,rpm_3)
       rpm_1    = 2.00*  data_dico["RPMMin"][i]
       rpm_2    = 1.00*  data_dico["RPMMax"][i]
       rpm_3    = 0.95*  data_dico["RPMMaxAllowed"][i]
-      rpm_1    = str(rpm_1)
-      rpm_2    = str(rpm_2)
-      rpm_3    = str(rpm_3)
 
+      # Troncature à l'unité près de toutes les valeurs numériques écrites dans les .cfg, pour
+      # éviter des résultats du type "1455.3680080282675" (bruit de calcul en virgule flottante).
       dico_variable = {
          "Fc"     : str(Fc),
          "Fd"     : str(Fd),
-         "Vc"     : str(Vc),
-         "Va"     : str(Va),
-         "Vg_red" : Vg_red,
-         "Vg"     : str(Vg),
-         "Vd"     : str(Vd),
-         "rpm_1"  : rpm_1,
-         "rpm_2"  : rpm_2,
-         "rpm_3"  : rpm_3,
+         "Vc"     : str(truncDecimal(Vc, 0)),
+         "Va"     : str(truncDecimal(Va, 0)),
+         "Vg_red" : str(truncDecimal(Vg_red, 0)),
+         "Vg"     : str(truncDecimal(Vg, 0)),
+         "Vd"     : str(truncDecimal(Vd, 0)),
+         "rpm_1"  : str(truncDecimal(rpm_1, 0)),
+         "rpm_2"  : str(truncDecimal(rpm_2, 0)),
+         "rpm_3"  : str(truncDecimal(rpm_3, 0)),
       }
       if TERMINAL == "PC": os.chdir(r"F:\Github Local\WRTI-Extractor\datas\cfg_files")
       if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files")
@@ -318,8 +317,10 @@ def import_data_from_extracted_data(data_dico):
           Vlow = "None" # Warning décrochage
       V1    = truncDecimal(min(EffectiveSpeed),0) # Seuil vitesse efficace bas
       V2    = truncDecimal(max(EffectiveSpeed),0) # Seuil vitesse efficace haut
-      MachCrit1 = data_dico["MachCritic1"][i] # Mach Critique
-      MachCrit2 = data_dico["MachCritic2"][i] # Mach Critique
+      # MachCrit reste a 2 decimales (pas a l'unite) : ce sont des ratios entre 0 et ~2, une
+      # troncature a l'unite les rendrait inutilisables (0.55 -> 0/1).
+      MachCrit1 = truncDecimal(data_dico["MachCritic1"][i], 2) # Mach Critique
+      MachCrit2 = truncDecimal(data_dico["MachCritic2"][i], 2) # Mach Critique
       # Altitude - altitudes de changement d'étage de compresseur, calculées à partir des vraies
       # courbes de puissance de chaque étage (cf. section "Modélisation physique du compresseur"
       # plus haut dans ce fichier), plutôt que par une marge fixe +/-20%/500m autour de l'altitude
@@ -330,18 +331,28 @@ def import_data_from_extracted_data(data_dico):
       stage_powers_at_ceiling = [data_dico["CompressorPowerAtCeiling0"][i], data_dico["CompressorPowerAtCeiling1"][i], data_dico["CompressorPowerAtCeiling2"][i]]
       Alt11, Alt12, Alt21, Alt22, Alt31, Alt32, Altmax = compressor_switch_altitudes(
           stage_altitudes, stage_powers, stage_ceilings, stage_powers_at_ceiling)
-      # Engine power
-      Power100 = data_dico["EnginePower"][i]
-      Power105 = 1.05*Power100
-      Power110 = 1.10*Power100
-      Power095 = 0.95*Power100
-      Power085 = 0.85*Power100
-      Power070 = 0.70*Power100
-      Power050 = 0.50*Power100
+      # Troncature à l'unité (mètre) : les altitudes de croisement sont issues d'une recherche
+      # numérique (dichotomie) et contiennent sinon de nombreuses décimales de bruit
+      # (ex: "1455.3680080282675").
+      Alt11 = truncDecimal(Alt11, 0)
+      Alt12 = truncDecimal(Alt12, 0)
+      Alt21 = truncDecimal(Alt21, 0)
+      Alt22 = truncDecimal(Alt22, 0)
+      Alt31 = truncDecimal(Alt31, 0)
+      Alt32 = truncDecimal(Alt32, 0)
+      Altmax = truncDecimal(Altmax, 0)
+      # Engine power - tronqué à l'unité près (ch), puis les paliers dérivés du même Power100 déjà arrondi
+      Power100 = truncDecimal(data_dico["EnginePower"][i], 0)
+      Power105 = truncDecimal(1.05*Power100, 0)
+      Power110 = truncDecimal(1.10*Power100, 0)
+      Power095 = truncDecimal(0.95*Power100, 0)
+      Power085 = truncDecimal(0.85*Power100, 0)
+      Power070 = truncDecimal(0.70*Power100, 0)
+      Power050 = truncDecimal(0.50*Power100, 0)
       # Cooling Air speed
-      CoolingSpeed = data_dico["CoolingEffectiveAirSpeed"][i]
-      OilT = data_dico["OilBoilingTemperature"][i]
-      WaterT = data_dico["WaterBoilingTemperature"][i]
+      CoolingSpeed = truncDecimal(data_dico["CoolingEffectiveAirSpeed"][i], 0)
+      OilT = truncDecimal(data_dico["OilBoilingTemperature"][i], 0)
+      WaterT = truncDecimal(data_dico["WaterBoilingTemperature"][i], 0)
 
       dico_variable = {
         "Vred"   : str(Vred),

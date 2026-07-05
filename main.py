@@ -17,9 +17,9 @@ from MyPack2.Myos import TERMINAL
 
 # Constante
 UPDATE_WTRTI_DATA = False           # Update les fichiers issue de war thunder
-GENERATE_CFG_FILES = True           # Régénère TOUS les .cfg à partir du modèle vierge (indispensable avant REPLACE_VARIABLES_IN_CFG pour repartir de valeurs à jour).
-REPLACE_VARIABLES_IN_CFG = False
-SYNC_CFG_TO_WTRTI = False           # Copie les .cfg de ce programme vers le dossier de profils WTRTI
+GENERATE_CFG_FILES = False           # Régénère TOUS les .cfg à partir du modèle vierge (indispensable avant REPLACE_VARIABLES_IN_CFG pour repartir de valeurs à jour).
+REPLACE_VARIABLES_IN_CFG = True
+SYNC_CFG_TO_WTRTI = True           # Copie les .cfg de ce programme vers le dossier de profils WTRTI
 SYNC_DRY_RUN = False                 # True = aperçu sans rien modifier, False = applique réellement la copie
 
 if TERMINAL == "MAC": os.chdir("/Users/florian/Github Local/WRTI-Extractor") # Ensure that the code begin in main folder
