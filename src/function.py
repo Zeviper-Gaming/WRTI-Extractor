@@ -46,25 +46,36 @@ def update_wtrti_data():
          line = line.replace(";",",")
          new_data_file.write(line)
 
-def generate_cfg_files(data_dico):
+def generate_cfg_files(data_dico, overwrite_existing=False):
    '''
    Fait une copie du fichier 0-custom.cfg pour chaques avions enregistrés dans "fm_data_db.csv"
    :0-custom.cfg:   Fichier cfg dans lequel on retrouve toutes les variables qui seront remplacé par ce programme par
                   les valeurs correctes pour chaques avions.
    :param data_dico:
+   :param overwrite_existing: False par défaut -> ne crée que les .cfg manquants (backfill), sans
+          écraser ceux déjà présents (donc déjà calculés). Mettre True pour tout régénérer depuis
+          zéro (nécessite de relancer ensuite REPLACE_VARIABLES_IN_CFG pour tout remplir à nouveau).
    :return:
    '''
    filename = "0-custom.cfg"
-   #os.chdir("F:\Github Local\WRTI-Extractor")
+   # Chemins absolus (indépendants du dossier courant) : cette fonction est appelée après que
+   # main.py ait déjà fait un os.chdir("datas/"), donc un chemin relatif "datas/..." pointerait
+   # à tort vers "datas/datas/..." - bug corrigé en passant en chemins absolus, comme pour
+   # sync_cfg_to_wtrti() et les autres fonctions qui écrivent dans les .cfg.
    if TERMINAL == "PC":
-      path_source = "datas"  #Dossier de config avec les données
-      path_target = "datas/cfg_files"  #Dossier regroupant les fichiers de chaques avions
+      path_source = r"F:\Github Local\WRTI-Extractor\datas"  #Dossier de config avec les données
+      path_target = r"F:\Github Local\WRTI-Extractor\datas\cfg_files"  #Dossier regroupant les fichiers de chaques avions
    elif TERMINAL == "MAC":
       path_source = "/Users/florian/Github Local/WRTI-Extractor/datas"
       path_target = "/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files"
+   created = 0
    for name in data_dico["aircraft"]:
-      if TERMINAL == "PC":    shutil.copy(f"{path_source}/{filename}",f"{path_target}/{name}.cfg")
-      if TERMINAL == "MAC":   shutil.copy(f"{path_source}/{filename}",f"{path_target}/{name}.cfg")
+      target_path = f"{path_target}/{name}.cfg"
+      if not overwrite_existing and os.path.isfile(target_path):
+         continue  # .cfg déjà présent (et donc déjà rempli) : on ne l'écrase pas
+      shutil.copy(f"{path_source}/{filename}", target_path)
+      created += 1
+   print(f"{created} fichier(s) .cfg créé(s)/régénéré(s) (sur {len(data_dico['aircraft'])} avions listés).")
 
 def import_data_from_dict(data_dico):
    '''
@@ -114,7 +125,11 @@ def import_data_from_dict(data_dico):
       }
       if TERMINAL == "PC": os.chdir(r"F:\Github Local\WRTI-Extractor\datas\cfg_files")
       if TERMINAL == "MAC":os.chdir("/Users/florian/Github Local/WRTI-Extractor/datas/cfg_files")
-      rewrite_cfg_file(f"{name}.cfg",dico_variable)
+      try:
+         rewrite_cfg_file(f"{name}.cfg",dico_variable)
+      except FileNotFoundError:
+         print(f"  -> {name}.cfg introuvable (avion pas encore généré), ignoré. "
+               f"Active GENERATE_CFG_FILES=True dans main.py pour le créer.")
 
 ########################################################################################################################
 # Modélisation physique du compresseur : calcul de l'altitude réelle de changement d'étage

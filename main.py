@@ -17,7 +17,7 @@ from MyPack2.Myos import TERMINAL
 
 # Constante
 UPDATE_WTRTI_DATA = False           # Update les fichiers issue de war thunder
-GENERATE_CFG_FILES = False
+GENERATE_CFG_FILES = True           # Ne crée que les .cfg manquants (nouveaux avions ajoutés au jeu) ; n'écrase jamais un .cfg déjà rempli. Peut rester à True en permanence.
 REPLACE_VARIABLES_IN_CFG = True
 SYNC_CFG_TO_WTRTI = False           # Copie les .cfg de ce programme vers le dossier de profils WTRTI
 SYNC_DRY_RUN = True                 # True = aperçu sans rien modifier, False = applique réellement la copie
